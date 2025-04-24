@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String    @id @default(cuid())
+  name     String
+  email    String    @unique
+  company  String
+  password String
+  phone    String
+  rating   Float
+  projects Project[]
+}
+
+model Developer {
+  id             String    @id @default(cuid())
+  Name           String
+  YOE            Decimal
+  Email          String    @unique
+  Phone          String    @unique
+  Password       String
+  overall_rating String    @unique
+  skills         Skill[]
+  chatrooms      Room[]
+  projects       Project[]
+}
+
+model Skill {
+  id           String    @unique @default(uuid())
+  developer_id String
+  rating       Decimal
+  dev          Developer @relation(fields: [developer_id], references: [id])
+
+  @@id([developer_id, id])
+}
+
+model Room {
+  Roomid     String      @id @default(uuid())
+  developers Developer[]
+  admin      String
+  project    Project?
+  chats      Chat[]
+}
+
+model Project {
+  id                  String      @id @default(uuid())
+  name                String
+  roomid              String      @unique
+  created_by          String
+  budget              Float
+  timeline            Int
+  required_developers Int
+  Assigned_developers Developer[]
+  room                Room        @relation(fields: [roomid], references: [Roomid])
+  createdby           User        @relation(fields: [created_by], references: [id])
+}
+
+model Chat {
+  id                 String @id @default(uuid())
+  room_id            String @unique
+  message_created_by String @unique
+  room               Room   @relation(fields: [room_id], references: [Roomid])
+  createdby          String
+}
+

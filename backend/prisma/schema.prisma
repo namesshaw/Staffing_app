@@ -22,18 +22,18 @@ model User {
   company  String
   password String
   phone    String
-  rating   Float
+  rating   Float @default(0) 
   projects Project[]
 }
 
 model Developer {
   id             String    @id @default(cuid())
   name           String
-  YOE            Decimal
+  YOE            Float
   email          String    @unique
   phone          String    @unique
   password       String
-  rating         String @default("0")    
+  rating         Float     @default(0)    
   skills         Skill[]
   chatrooms      Room[]
   projects       Project[]
@@ -42,7 +42,8 @@ model Developer {
 model Skill {
   id           String    @unique @default(uuid())
   developer_id String
-  rating       Decimal
+  name         String
+  proficiency  String     
   dev          Developer @relation(fields: [developer_id], references: [id])
 
   @@id([developer_id, id])
@@ -59,13 +60,13 @@ model Room {
 model Project {
   id                  String      @id @default(uuid())
   name                String
-  roomid              String      @unique
+  roomid              String?      @unique
   created_by          String
   budget              Float
   timeline            Int
   required_developers Int
   Assigned_developers Developer[]
-  room                Room        @relation(fields: [roomid], references: [Roomid])
+  room                Room?        @relation(fields: [roomid], references: [Roomid])
   createdby           User        @relation(fields: [created_by], references: [id])
 }
 

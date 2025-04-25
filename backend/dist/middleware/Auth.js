@@ -12,12 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.devsinsupauth = exports.usersinsupauth = void 0;
+exports.devAuth = exports.userAuth = void 0;
 const db_1 = __importDefault(require("../db/db"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const usersinsupauth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.headers.authorization;
     if (!token) {
         return void res.status(400).json({
@@ -36,10 +36,11 @@ const usersinsupauth = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
             error: "This is a authenticated endpoint and you are not authorized to view this w/o signin/signup"
         });
     }
+    req.user = user;
     next();
 });
-exports.usersinsupauth = usersinsupauth;
-const devsinsupauth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.userAuth = userAuth;
+const devAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.headers.authorization;
     if (!token) {
         return void res.status(400).json({
@@ -48,16 +49,17 @@ const devsinsupauth = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
     const decoded = jsonwebtoken_1.default.verify(token, //@ts-ignore
     process.env.JWT_SECRET);
-    const user = yield db_1.default.developer.findFirst({
+    const developer = yield db_1.default.developer.findFirst({
         where: {
             id: decoded.userId
         }
     });
-    if (!user) {
+    if (!developer) {
         return void res.status(400).json({
             error: "This is a authenticated endpoint and you are not authorized to view this w/o signin/signup"
         });
     }
+    req.developer = developer;
     next();
 });
-exports.devsinsupauth = devsinsupauth;
+exports.devAuth = devAuth;

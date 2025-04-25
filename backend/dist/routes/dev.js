@@ -18,6 +18,7 @@ const db_1 = __importDefault(require("../db/db"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
+const Auth_1 = require("../middleware/Auth");
 const router = express_1.default.Router();
 const DEVELOPER = zod_1.default.object({
     name: zod_1.default.string(),
@@ -25,35 +26,35 @@ const DEVELOPER = zod_1.default.object({
     email: zod_1.default.string(),
     phone: zod_1.default.string(),
     password: zod_1.default.string(),
-    rating: zod_1.default.string()
+    rating: zod_1.default.number().optional().default(0)
 });
 const SIGNINBODY = zod_1.default.object({
     email: zod_1.default.string(),
     password: zod_1.default.string()
 });
 router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const parseddev = DEVELOPER.safeParse(req.body);
-    if (!parseddev.success) {
+    const parsedDev = DEVELOPER.safeParse(req.body);
+    if (!parsedDev.success) {
         return void res.status(400).json({
             error: "Invalid Format"
         });
     }
-    const devloper = yield db_1.default.developer.create({
+    const developer = yield db_1.default.developer.create({
         data: {
-            name: parseddev.data.name,
-            YOE: parseddev.data.YOE,
-            email: parseddev.data.email,
-            phone: parseddev.data.phone,
-            password: parseddev.data.password,
+            name: parsedDev.data.name,
+            YOE: parsedDev.data.YOE,
+            email: parsedDev.data.email,
+            phone: parsedDev.data.phone,
+            password: parsedDev.data.password,
         }
     });
-    if (!devloper) {
+    if (!developer) {
         return void res.status(400).json({
             error: "Unable to create a record try after some time"
         });
     }
     const token = jsonwebtoken_1.default.sign({
-        userId: devloper.id
+        userId: developer.id
     }
     //@ts-ignore
     , process.env.JWT_SECRET);
@@ -91,5 +92,47 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
     return void res.status(200).json({
         error: "Inputs are incorrect please check your username and password"
     });
+}));
+router.post("/addskills", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const skills = req.body.skills;
+    const devId = (_a = req.developer) === null || _a === void 0 ? void 0 : _a.id;
+    try {
+        if (!Array.isArray(skills)) {
+            return void res.status(400).json({ error: 'Skills must be an array' });
+        }
+        let isValid = true;
+        skills.forEach(skill => {
+            if (!skill.name || !skill.proficiency) {
+                isValid = false;
+            }
+        });
+        if (!isValid) {
+            return void res.status(400).json({
+                message: 'Each skill must have a name and proficiency'
+            });
+        }
+        const createdSkills = yield db_1.default.skill.createMany({
+            data: skills.map(skill => ({
+                developer_id: devId,
+                name: skill.name,
+                proficiency: skill.proficiency
+            }))
+        });
+        return void res.status(200).json({
+            message: 'Skills added successfully',
+            data: createdSkills
+        });
+    }
+    catch (e) {
+        console.log(e, "ERR");
+        return void res.status(511).json({
+            message: "Something went wrong"
+        });
+    }
+}));
+router.put("/edit", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const editFields = req.body;
+    return;
 }));
 exports.default = router;

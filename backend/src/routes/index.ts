@@ -1,7 +1,7 @@
 import express from "express"
 const router = express.Router()
-import adminrouter from "./admin"
-import devrouter   from "./dev"
-router.use("/admin", adminrouter)
-router.use("/dev", devrouter)
+import clientRouter from "./client"
+import devRouter   from "./dev"
+router.use("/client", clientRouter)
+router.use("/dev", devRouter)
 export default router

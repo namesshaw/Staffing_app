@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import  dotenv from 'dotenv'
-dotenv.config({ path: "../../.env"})
+dotenv.config()
 
  const prismaClient = new PrismaClient({
     datasources:{

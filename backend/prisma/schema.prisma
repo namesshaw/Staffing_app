@@ -28,12 +28,12 @@ model User {
 
 model Developer {
   id             String    @id @default(cuid())
-  Name           String
+  name           String
   YOE            Decimal
-  Email          String    @unique
-  Phone          String    @unique
-  Password       String
-  overall_rating String    @unique
+  email          String    @unique
+  phone          String    @unique
+  password       String
+  rating         String @default("0")    
   skills         Skill[]
   chatrooms      Room[]
   projects       Project[]

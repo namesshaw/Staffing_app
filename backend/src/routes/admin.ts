@@ -22,7 +22,7 @@ const SIGNINBODY = zod.object({
     email: zod.string().email(),
     password: zod.string()
 })
-router.post("/signup", usersinsupauth, async (req: Request, res: Response) => {
+router.post("/signup", async (req: Request, res: Response) => {
     const parseduser = USER_BODY.safeParse(req.body);
   
     if (!parseduser.success) {
@@ -54,7 +54,7 @@ router.post("/signup", usersinsupauth, async (req: Request, res: Response) => {
       return void res.status(500).json({ error: "Internal Server Error" });
     }
   })
-  router.post("/signin", usersinsupauth, async(req: Request, res: Response)=>{
+  router.post("/signin", async(req: Request, res: Response)=>{
     const parsedsignin = SIGNINBODY.safeParse(req.body)
     if(!parsedsignin.success){
         return void res.status(400).json({

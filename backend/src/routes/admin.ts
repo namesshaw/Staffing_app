@@ -2,6 +2,7 @@ import express from "express"
 import { Request, Response} from "express"
 import jwt from "jsonwebtoken"
 import zod from "zod"
+import { usersinsupauth } from "../middleware/sinsupauth"
 import dotenv from "dotenv"
 dotenv.config()
 
@@ -21,7 +22,7 @@ const SIGNINBODY = zod.object({
     email: zod.string().email(),
     password: zod.string()
 })
-router.post("/signup", async (req: Request, res: Response) => {
+router.post("/signup", usersinsupauth, async (req: Request, res: Response) => {
     const parseduser = USER_BODY.safeParse(req.body);
   
     if (!parseduser.success) {
@@ -53,7 +54,7 @@ router.post("/signup", async (req: Request, res: Response) => {
       return void res.status(500).json({ error: "Internal Server Error" });
     }
   })
-  router.post("/signin", async(req: Request, res: Response)=>{
+  router.post("/signin", usersinsupauth, async(req: Request, res: Response)=>{
     const parsedsignin = SIGNINBODY.safeParse(req.body)
     if(!parsedsignin.success){
         return void res.status(400).json({

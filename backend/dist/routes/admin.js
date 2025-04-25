@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const zod_1 = __importDefault(require("zod"));
+const sinsupauth_1 = require("../middleware/sinsupauth");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const db_1 = __importDefault(require("../db/db"));
@@ -31,7 +32,7 @@ const SIGNINBODY = zod_1.default.object({
     email: zod_1.default.string().email(),
     password: zod_1.default.string()
 });
-router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/signup", sinsupauth_1.usersinsupauth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const parseduser = USER_BODY.safeParse(req.body);
     if (!parseduser.success) {
         return void res.status(400).json({ error: "Invalid user data" });
@@ -60,7 +61,7 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
         return void res.status(500).json({ error: "Internal Server Error" });
     }
 }));
-router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/signin", sinsupauth_1.usersinsupauth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const parsedsignin = SIGNINBODY.safeParse(req.body);
     if (!parsedsignin.success) {
         return void res.status(400).json({

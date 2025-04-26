@@ -21,45 +21,59 @@ const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     const token = req.headers.authorization;
     if (!token) {
         return void res.status(400).json({
-            error: "jwt not present"
+            error: "jwt not present",
         });
     }
-    const decoded = jsonwebtoken_1.default.verify(token, //@ts-ignore
-    process.env.JWT_SECRET);
-    const user = yield db_1.default.user.findFirst({
-        where: {
-            id: decoded.userId
+    try {
+        const decoded = jsonwebtoken_1.default.verify(token, //@ts-ignore
+        process.env.JWT_SECRET);
+        const user = yield db_1.default.user.findFirst({
+            where: {
+                id: decoded.userId,
+            },
+        });
+        if (!user) {
+            return void res.status(400).json({
+                error: "This is a authenticated endpoint and you are not authorized to view this w/o signin/signup",
+            });
         }
-    });
-    if (!user) {
+        req.user = user;
+        next();
+    }
+    catch (error) {
         return void res.status(400).json({
-            error: "This is a authenticated endpoint and you are not authorized to view this w/o signin/signup"
+            message: "Json webtoken invalid",
         });
     }
-    req.user = user;
-    next();
 });
 exports.userAuth = userAuth;
 const devAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.headers.authorization;
-    if (!token) {
-        return void res.status(400).json({
-            error: "jwt not present"
-        });
-    }
-    const decoded = jsonwebtoken_1.default.verify(token, //@ts-ignore
-    process.env.JWT_SECRET);
-    const developer = yield db_1.default.developer.findFirst({
-        where: {
-            id: decoded.userId
+    try {
+        const token = req.headers.authorization;
+        if (!token) {
+            return void res.status(400).json({
+                error: "jwt not present",
+            });
         }
-    });
-    if (!developer) {
+        const decoded = jsonwebtoken_1.default.verify(token, //@ts-ignore
+        process.env.JWT_SECRET);
+        const developer = yield db_1.default.developer.findFirst({
+            where: {
+                id: decoded.userId,
+            },
+        });
+        if (!developer) {
+            return void res.status(400).json({
+                error: "This is a authenticated endpoint and you are not authorized to view this w/o signin/signup",
+            });
+        }
+        req.developer = developer;
+        next();
+    }
+    catch (error) {
         return void res.status(400).json({
-            error: "This is a authenticated endpoint and you are not authorized to view this w/o signin/signup"
+            message: "Json webtoken invalid",
         });
     }
-    req.developer = developer;
-    next();
 });
 exports.devAuth = devAuth;

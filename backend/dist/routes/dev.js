@@ -26,17 +26,17 @@ const DEVELOPER = zod_1.default.object({
     email: zod_1.default.string(),
     phone: zod_1.default.string(),
     password: zod_1.default.string(),
-    rating: zod_1.default.number().optional().default(0)
+    rating: zod_1.default.number().optional().default(0),
 });
 const SIGNINBODY = zod_1.default.object({
     email: zod_1.default.string(),
-    password: zod_1.default.string()
+    password: zod_1.default.string(),
 });
 router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const parsedDev = DEVELOPER.safeParse(req.body);
     if (!parsedDev.success) {
         return void res.status(400).json({
-            error: "Invalid Format"
+            error: "Invalid Format",
         });
     }
     const developer = yield db_1.default.developer.create({
@@ -46,93 +46,145 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
             email: parsedDev.data.email,
             phone: parsedDev.data.phone,
             password: parsedDev.data.password,
-        }
+        },
     });
     if (!developer) {
         return void res.status(400).json({
-            error: "Unable to create a record try after some time"
+            error: "Unable to create a record try after some time",
         });
     }
     const token = jsonwebtoken_1.default.sign({
-        userId: developer.id
-    }
+        userId: developer.id,
+    }, 
     //@ts-ignore
-    , process.env.JWT_SECRET);
+    process.env.JWT_SECRET);
     return void res.status(200).json({
-        token: token
+        token: token,
     });
 }));
 router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const parsedsignin = SIGNINBODY.safeParse(req.body);
     if (!parsedsignin.success) {
         return void res.status(400).json({
-            error: "Invalid Format"
+            error: "Invalid Format",
         });
     }
     const developer = yield db_1.default.developer.findFirst({
         where: {
-            email: parsedsignin.data.email
-        }
+            email: parsedsignin.data.email,
+        },
     });
     if (!developer) {
         return void res.status(400).json({
-            error: "You are not signedup"
+            error: "You are not signedup",
         });
     }
     if (developer.password === req.body.password) {
         const token = jsonwebtoken_1.default.sign({
-            userId: developer.id
+            userId: developer.id,
         }, 
         //@ts-ignore
         process.env.JWT_SECRET);
         return void res.status(400).json({
-            token: token
+            token: token,
         });
     }
     return void res.status(200).json({
-        error: "Inputs are incorrect please check your username and password"
+        error: "Inputs are incorrect please check your username and password",
     });
 }));
-router.post("/addskills", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put("/addskills", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const skills = req.body.skills;
     const devId = (_a = req.developer) === null || _a === void 0 ? void 0 : _a.id;
     try {
         if (!Array.isArray(skills)) {
-            return void res.status(400).json({ error: 'Skills must be an array' });
+            return void res.status(400).json({ error: "Skills must be an array" });
         }
         let isValid = true;
-        skills.forEach(skill => {
+        skills.forEach((skill) => {
             if (!skill.name || !skill.proficiency) {
                 isValid = false;
             }
         });
         if (!isValid) {
             return void res.status(400).json({
-                message: 'Each skill must have a name and proficiency'
+                message: "Each skill must have a name and proficiency",
             });
         }
+        yield db_1.default.skill.deleteMany({
+            where: {
+                developer_id: devId,
+            },
+        });
         const createdSkills = yield db_1.default.skill.createMany({
-            data: skills.map(skill => ({
+            data: skills.map((skill) => ({
                 developer_id: devId,
                 name: skill.name,
-                proficiency: skill.proficiency
-            }))
+                proficiency: skill.proficiency,
+            })),
         });
         return void res.status(200).json({
-            message: 'Skills added successfully',
-            data: createdSkills
+            message: "Skills added successfully",
+            data: createdSkills,
         });
     }
     catch (e) {
         console.log(e, "ERR");
         return void res.status(511).json({
-            message: "Something went wrong"
+            message: "Something went wrong",
         });
     }
 }));
-router.put("/edit", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const editFields = req.body;
-    return;
+router.get("/getskills", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const devId = (_a = req.developer) === null || _a === void 0 ? void 0 : _a.id;
+    try {
+        const Skills = yield db_1.default.developer.findMany({
+            where: { id: devId },
+            select: { skills: true }
+        });
+        return void res.status(211).json(Skills);
+    }
+    catch (e) {
+        console.log(e);
+        return void res.status(511).json({
+            message: "Couldnt get the skills"
+        });
+    }
+}));
+router.get("/info", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return void res.status(200).json(req.developer);
+    }
+    catch (e) {
+        console.log("ERR", e);
+        return void res.status(511).json({
+            message: "Could'nt get the data",
+        });
+    }
+}));
+router.put("/edit/:field", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const field = req.params.field;
+    const change = req.body.change;
+    const devId = (_a = req.developer) === null || _a === void 0 ? void 0 : _a.id;
+    try {
+        const data = yield db_1.default.developer.update({
+            where: { id: devId },
+            data: {
+                [field]: change,
+            },
+        });
+        return void res.status(211).json({
+            message: "Updated Successfully",
+        });
+    }
+    catch (e) {
+        console.log(e);
+        return void res.status(511).json({
+            message: "Failed to update",
+        });
+    }
 }));
 exports.default = router;

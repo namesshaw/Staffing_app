@@ -3,7 +3,11 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-export default function Navbar() {
+interface NavbarProps {
+  onSignupClick: () => void;
+}
+
+export default function Navbar({ onSignupClick }: NavbarProps) {
   return (
     <motion.nav
       className="flex justify-between items-center p-6 backdrop-blur-xl bg-white/50 shadow-lg sticky top-0 z-50 border-b border-blue-100"
@@ -12,7 +16,7 @@ export default function Navbar() {
       transition={{ type: "spring", stiffness: 80 }}
     >
       <Link href="/" className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-400 text-transparent bg-clip-text animate-pulse">
-        Staffitup
+        StaffingUp
       </Link>
       <div className="flex items-center space-x-6">
         {['Features', 'About', 'Contact'].map((item, idx) => (
@@ -23,12 +27,12 @@ export default function Navbar() {
         <Link href="/signin" className="text-blue-700 hover:text-cyan-600 font-bold">
           Sign In
         </Link>
-        <Link
-          href="/signup"
+        <button
+          onClick={onSignupClick}
           className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-md hover:shadow-2xl hover:scale-105 transition font-semibold"
         >
           Sign Up
-        </Link>
+        </button>
       </div>
     </motion.nav>
   );

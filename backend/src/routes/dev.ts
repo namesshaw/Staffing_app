@@ -1,133 +1,186 @@
-import express from "express"
-import zod, { ParseStatus } from "zod"
-import prismaClient from "../db/db"
-import jwt from "jsonwebtoken"
-import dotenv from "dotenv"
-dotenv.config()
-import {devAuth} from "../middleware/Auth" 
-import {Skill, Developer} from "../interfaces"
-import {Request, Response} from "express"
+import express from "express";
+import zod, { ParseStatus } from "zod";
+import prismaClient from "../db/db";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
+import { devAuth } from "../middleware/Auth";
+import { Skill, Developer } from "../interfaces";
+import { Request, Response } from "express";
 interface DeveloperRequest extends Request {
     developer?: Developer;
-  }
-const router = express.Router()
+}
+const router = express.Router();
 const DEVELOPER = zod.object({
-     name:        zod.string(),
-     YOE:         zod.number().multipleOf(0.1),
-     email:       zod.string(),
-     phone:       zod.string(),
-     password:    zod.string(),
-     rating:      zod.number().optional().default(0)
-})
+    name: zod.string(),
+    YOE: zod.number().multipleOf(0.1),
+    email: zod.string(),
+    phone: zod.string(),
+    password: zod.string(),
+    rating: zod.number().optional().default(0),
+});
 const SIGNINBODY = zod.object({
-    email:    zod.string(),
-    password: zod.string()
-})
-router.post("/signup", async(req, res)=>{
-    const parsedDev = DEVELOPER.safeParse(req.body)
-    if(!parsedDev.success){
+    email: zod.string(),
+    password: zod.string(),
+});
+router.post("/signup", async (req, res) => {
+    const parsedDev = DEVELOPER.safeParse(req.body);
+    if (!parsedDev.success) {
         return void res.status(400).json({
-            error: "Invalid Format"
-        })
+            error: "Invalid Format",
+        });
     }
     const developer = await prismaClient.developer.create({
-        data:{
-            name :parsedDev.data.name,
-            YOE :parsedDev.data.YOE,
-            email :parsedDev.data.email,
-            phone :parsedDev.data.phone,
-            password :parsedDev.data.password,
-        }
-    })
-    if(!developer){
+        data: {
+            name: parsedDev.data.name,
+            YOE: parsedDev.data.YOE,
+            email: parsedDev.data.email,
+            phone: parsedDev.data.phone,
+            password: parsedDev.data.password,
+        },
+    });
+    if (!developer) {
         return void res.status(400).json({
-            error: "Unable to create a record try after some time"
-        })
+            error: "Unable to create a record try after some time",
+        });
     }
-    const token = jwt.sign({
-                userId: developer.id
-            }
-            //@ts-ignore
-        , process.env.JWT_SECRET
-        )
-        return void res.status(200).json({
-            token: token
-        })
-} )
-router.post("/signin", async(req, res)=>{
-    const parsedsignin = SIGNINBODY.safeParse(req.body)
-    if(!parsedsignin.success){
+    const token = jwt.sign(
+        {
+            userId: developer.id,
+        },
+        //@ts-ignore
+        process.env.JWT_SECRET
+    );
+    return void res.status(200).json({
+        token: token,
+    });
+});
+router.post("/signin", async (req, res) => {
+    const parsedsignin = SIGNINBODY.safeParse(req.body);
+    if (!parsedsignin.success) {
         return void res.status(400).json({
-            error: "Invalid Format"
-        })
+            error: "Invalid Format",
+        });
     }
     const developer = await prismaClient.developer.findFirst({
         where: {
-            email: parsedsignin.data.email
-        }
-    })
-    if(!developer){
+            email: parsedsignin.data.email,
+        },
+    });
+    if (!developer) {
         return void res.status(400).json({
-            error: "You are not signedup"
-        })
-        
+            error: "You are not signedup",
+        });
     }
-    if(developer.password===req.body.password){
-        const token = jwt.sign({
-            userId: developer.id
-        }, 
-    //@ts-ignore
-    process.env.JWT_SECRET
-    )
-    return void res.status(400).json({
-        token: token
-    })
+    if (developer.password === req.body.password) {
+        const token = jwt.sign(
+            {
+                userId: developer.id,
+            },
+            //@ts-ignore
+            process.env.JWT_SECRET
+        );
+        return void res.status(400).json({
+            token: token,
+        });
     }
     return void res.status(200).json({
-        error: "Inputs are incorrect please check your username and password"
-    })
-})
+        error: "Inputs are incorrect please check your username and password",
+    });
+});
 
-router.post("/addskills", devAuth, async(req : DeveloperRequest, res : Response) => {
-    
-        const skills:Skill[] = req.body.skills as { name: string, proficiency: string, developer_id : string }[]
-        const devId = (req as any).developer?.id
-    try{
+router.put("/addskills", devAuth, async (req: DeveloperRequest, res: Response) => {
+    const skills: Skill[] = req.body.skills as {
+        name: string;
+        proficiency: string;
+        developer_id: string;
+    }[];
+    const devId = (req as any).developer?.id;
+    try {
         if (!Array.isArray(skills)) {
-            return void res.status(400).json({ error: 'Skills must be an array' });
+            return void res.status(400).json({ error: "Skills must be an array" });
         }
         let isValid = true;
-        skills.forEach(skill => {
-            if(!skill.name || !skill.proficiency){
-                isValid = false
+        skills.forEach((skill) => {
+            if (!skill.name || !skill.proficiency) {
+                isValid = false;
             }
-        })
-        if(!isValid){
+        });
+        if (!isValid) {
             return void res.status(400).json({
-                message : 'Each skill must have a name and proficiency'
-            })
+                message: "Each skill must have a name and proficiency",
+            });
         }
+        await prismaClient.skill.deleteMany({
+            where: {
+                developer_id: devId,
+            },
+        });
         const createdSkills = await prismaClient.skill.createMany({
-                data : skills.map(skill => ({
-                        developer_id : devId, 
-                        name : skill.name,
-                        proficiency : skill.proficiency
-            }))
+            data: skills.map((skill) => ({
+                developer_id: devId,
+                name: skill.name,
+                proficiency: skill.proficiency,
+            })),
         });
         return void res.status(200).json({
-            message: 'Skills added successfully',
-            data: createdSkills
+            message: "Skills added successfully",
+            data: createdSkills,
         });
-    }catch(e){
-        console.log(e, "ERR")
+    } catch (e) {
+        console.log(e, "ERR");
         return void res.status(511).json({
-            message : "Something went wrong"
+            message: "Something went wrong",
+        });
+    }
+}
+);
+router.get("/getskills", devAuth, async (req, res) => {
+    const devId = (req as any).developer?.id;
+    try {
+        const Skills = await prismaClient.developer.findMany({
+            where: { id: devId },
+            select: { skills: true }
+        })
+        return void res.status(211).json(Skills)
+    } catch (e) {
+        console.log(e);
+        return void res.status(511).json({
+            message: "Couldnt get the skills"
         })
     }
-})
 
-router.put("/edit", devAuth, async(req, res) => {
-    const editFields = req.body
-    return
-})
-export default router
+});
+router.get("/info", devAuth, async (req, res) => {
+    try {
+        return void res.status(200).json((req as any).developer);
+    } catch (e) {
+        console.log("ERR", e);
+        return void res.status(511).json({
+            message: "Could'nt get the data",
+        });
+    }
+});
+
+router.put("/edit/:field", devAuth, async (req, res) => {
+    const field = req.params.field;
+    const change = req.body.change;
+    const devId = (req as any).developer?.id;
+    try {
+        const data = await prismaClient.developer.update({
+            where: { id: devId },
+            data: {
+                [field]: change,
+            },
+        });
+        return void res.status(211).json({
+            message: "Updated Successfully",
+        });
+    } catch (e) {
+        console.log(e);
+        return void res.status(511).json({
+            message: "Failed to update",
+        });
+    }
+});
+export default router;

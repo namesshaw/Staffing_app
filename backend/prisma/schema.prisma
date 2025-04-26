@@ -60,7 +60,7 @@ model Room {
 model Project {
   id                  String      @id @default(uuid())
   name                String
-  roomid              String?      @unique
+  roomid              String      @unique
   created_by          String
   budget              Float
   timeline            Int

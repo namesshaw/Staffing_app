@@ -8,15 +8,17 @@ import { setAuthCookie } from '../../_cookies/cookies'
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { login } from '@/public/features/authSlice';
+import {User} from "../../../../../backend/src/interfaces"
 export default function UserSignup() {
   const dispatch = useDispatch()
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Omit<User,"id">>({
     name: '',
     email: '',
     company: '',
     password: '',
     phone: '',
+    rating: 0
   });
 
   const [submitted, setSubmitted] = useState(false);

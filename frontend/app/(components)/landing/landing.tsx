@@ -13,7 +13,7 @@ export default function Home() {
   const closeModal = () => setIsModalOpen(false);
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 min-h-screen flex flex-col overflow-x-hidden">
+    <div className="bg-gradient-to-br from-orange-400 via-orange-300 to-orange-400 min-h-screen flex flex-col overflow-x-hidden">
       {/* Navbar with signup modal handler */}
       <Navbar onSignupClick={openModal} />
 
@@ -30,7 +30,7 @@ export default function Home() {
           />
 
           <motion.h1
-            className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-400 text-transparent bg-clip-text mb-6"
+            className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-blue-600 to-blue-900 text-transparent bg-clip-text mb-6"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1 }}
@@ -53,7 +53,7 @@ export default function Home() {
               console.log('Button clicked');
               openModal();
             }}
-            className="px-8 py-4 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-lg font-bold shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300 ease-in-out"
+            className="px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 to-blue-900 text-white text-lg font-bold shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300 ease-in-out"
             style={{ zIndex: 10 }} // Add a higher z-index to the button
           >
             Get Started
@@ -96,7 +96,7 @@ export default function Home() {
               About Us
             </motion.h2>
             <motion.p
-              className="text-xl text-blue-400"
+              className="text-xl text-blue-700"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -128,7 +128,7 @@ export default function Home() {
 
             <motion.a
               href="/contact"
-              className="px-6 py-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white text-lg font-bold shadow-md hover:scale-110 hover:shadow-2xl transition-all duration-300 ease-in-out"
+              className="px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-900 text-white text-lg font-bold shadow-md hover:scale-110 hover:shadow-2xl transition-all duration-300 ease-in-out"
               whileHover={{ scale: 1.1 }}
             >
               Contact Us

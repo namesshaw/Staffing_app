@@ -54,13 +54,13 @@ export default function SignupPromptModal({ isOpen, closeModal }: SignupPromptMo
                   transition={{ delay: 0.4 }}
                 >
                   <Link
-                    href="/signup?type=developer"
+                    href="/devsignup"
                     className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold rounded-full hover:scale-105 hover:shadow-lg transition"
                   >
                     I am a Developer
                   </Link>
                   <Link
-                    href="/signup?type=user"
+                    href="/usersignup"
                     className="w-full py-3 border-2 border-blue-400 text-blue-600 font-semibold rounded-full hover:scale-105 hover:bg-blue-50 transition"
                   >
                     I am a User

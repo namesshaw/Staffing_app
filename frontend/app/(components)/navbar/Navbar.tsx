@@ -8,12 +8,14 @@ import SigninPromptModal from '../signinpromptModel/SigninPromptModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/public/store';
 import { logout } from '@/public/features/authSlice';
+import { useRouter } from 'next/navigation';
 
 interface NavbarProps {
   onSignupClick: () => void;
 }
 
 export default function Navbar({ onSignupClick }: NavbarProps) {
+  const router = useRouter()
   const dispatch = useDispatch()
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,6 +70,13 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
         </button>
       </div>):
       (<div>
+        <button
+         onClick={()=>router.push("/myprofile")}
+          className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-md hover:shadow-2xl hover:scale-105 transition font-semibold"
+        >
+          Profile
+
+        </button>
          <button
          onClick={handlelogout}
           className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-md hover:shadow-2xl hover:scale-105 transition font-semibold"

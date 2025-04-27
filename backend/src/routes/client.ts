@@ -25,7 +25,7 @@ const USER_BODY = zod.object({
   company: zod.string(),
   password: zod.string(),
   phone: zod.string(),
-  rating: zod.number().multipleOf(0.01),
+  rating: zod.number().multipleOf(0.01).optional(),
 });
 const SIGNINBODY = zod.object({
   email: zod.string().email(),
@@ -55,7 +55,7 @@ router.post("/signup", async (req: Request, res: Response) => {
         userId: user.id,
       },
       //@ts-ignore
-      process.env.JWT_SECRET
+      process.env.USER_JWT_SECRET
     );
     return void res.status(200).json({
       token: token,
@@ -98,7 +98,7 @@ router.post("/signin", async (req: Request, res: Response) => {
         userId: user.id,
       },
       //@ts-ignore
-      process.env.JWT_SECRET
+      process.env.USER_JWT_SECRET
     );
     return void res.status(200).json({
       token: token,

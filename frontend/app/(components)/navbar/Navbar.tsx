@@ -5,15 +5,26 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FiMenu, FiX } from 'react-icons/fi';
 import SigninPromptModal from '../signinpromptModel/SigninPromptModal';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/public/store';
+import { logout } from '@/public/features/authSlice';
+import { useRouter } from 'next/navigation';
 
 interface NavbarProps {
   onSignupClick: () => void;
 }
 
 export default function Navbar({ onSignupClick }: NavbarProps) {
+  const router = useRouter()
+  const dispatch = useDispatch()
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const islogin = useSelector((state:RootState)=>state.auth.isAuthenticated)
+  
 
+  async function handlelogout() {
+    dispatch(logout())
+  }
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   return (
@@ -30,7 +41,8 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
       </Link>
 
       {/* Desktop Menu */}
-      <div className="hidden md:flex items-center space-x-6">
+      { !islogin?
+      (<div className="hidden md:flex items-center space-x-6">
         {['Features', 'About', 'Contact'].map((item, idx) => (
           <Link 
             key={idx} 
@@ -40,6 +52,8 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
             {item}
           </Link>
         ))}
+
+        
         <Link href="/" className="text-blue-700 hover:text-cyan-600 font-bold"
         onClick={() => {
           console.log('Button clicked');
@@ -54,7 +68,24 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
         >
           Sign Up
         </button>
-      </div>
+      </div>):
+      (<div>
+        <button
+         onClick={()=>router.push("/myprofile")}
+          className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-md hover:shadow-2xl hover:scale-105 transition font-semibold"
+        >
+          Profile
+
+        </button>
+         <button
+         onClick={handlelogout}
+          className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-md hover:shadow-2xl hover:scale-105 transition font-semibold"
+        >
+          Logout
+
+        </button>
+      </div>)
+      }
 
       {/* Mobile Hamburger Icon */}
       <div className="md:hidden flex items-center">

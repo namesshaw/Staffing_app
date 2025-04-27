@@ -26,7 +26,7 @@ const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
     try {
         const decoded = jsonwebtoken_1.default.verify(token, //@ts-ignore
-        process.env.JWT_SECRET);
+        process.env.USER_JWT_SECRET);
         const user = yield db_1.default.user.findFirst({
             where: {
                 id: decoded.userId,
@@ -56,7 +56,7 @@ const devAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
             });
         }
         const decoded = jsonwebtoken_1.default.verify(token, //@ts-ignore
-        process.env.JWT_SECRET);
+        process.env.DEV_JWT_SECRET);
         const developer = yield db_1.default.developer.findFirst({
             where: {
                 id: decoded.userId,

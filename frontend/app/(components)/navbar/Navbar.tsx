@@ -36,7 +36,7 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
       transition={{ type: "spring", stiffness: 80 }}
     >
       {/* Logo */}
-      <Link href="/" className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-400 text-transparent bg-clip-text animate-pulse">
+      <Link href="/" className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-700 text-transparent bg-clip-text animate-pulse">
         StaffingUp
       </Link>
 

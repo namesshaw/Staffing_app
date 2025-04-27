@@ -27,7 +27,7 @@ export const userAuth = async (
     try {
         const decoded = jwt.verify(
             token, //@ts-ignore
-            process.env.JWT_SECRET
+            process.env.USER_JWT_SECRET
         );
         const user: User | null = await prismaClient.user.findFirst({
             where: {
@@ -63,7 +63,7 @@ export const devAuth = async (
         }
         const decoded = jwt.verify(
             token, //@ts-ignore
-            process.env.JWT_SECRET
+            process.env.DEV_JWT_SECRET
         );
         const developer: Developer | null = await prismaClient.developer.findFirst({
             where: {

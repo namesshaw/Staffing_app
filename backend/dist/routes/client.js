@@ -33,7 +33,7 @@ const USER_BODY = zod_1.default.object({
     company: zod_1.default.string(),
     password: zod_1.default.string(),
     phone: zod_1.default.string(),
-    rating: zod_1.default.number().multipleOf(0.01),
+    rating: zod_1.default.number().multipleOf(0.01).optional(),
 });
 const SIGNINBODY = zod_1.default.object({
     email: zod_1.default.string().email(),
@@ -59,7 +59,7 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
             userId: user.id,
         }, 
         //@ts-ignore
-        process.env.JWT_SECRET);
+        process.env.USER_JWT_SECRET);
         return void res.status(200).json({
             token: token,
         });
@@ -101,7 +101,7 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
             userId: user.id,
         }, 
         //@ts-ignore
-        process.env.JWT_SECRET);
+        process.env.USER_JWT_SECRET);
         return void res.status(200).json({
             token: token,
         });

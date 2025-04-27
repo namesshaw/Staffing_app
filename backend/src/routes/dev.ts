@@ -49,7 +49,7 @@ router.post("/signup", async (req, res) => {
             userId: developer.id,
         },
         //@ts-ignore
-        process.env.JWT_SECRET
+        process.env.DEV_JWT_SECRET
     );
     return void res.status(200).json({
         token: token,
@@ -78,13 +78,13 @@ router.post("/signin", async (req, res) => {
                 userId: developer.id,
             },
             //@ts-ignore
-            process.env.JWT_SECRET
+            process.env.DEV_JWT_SECRET
         );
-        return void res.status(400).json({
+        return void res.status(200).json({
             token: token,
         });
     }
-    return void res.status(200).json({
+    return void res.status(400).json({
         error: "Inputs are incorrect please check your username and password",
     });
 });

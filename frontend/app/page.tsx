@@ -1,103 +1,149 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import Navbar from './(components)/navbar/Navbar';
+import Footer from './(components)/footer/Footer';
+import SignupPromptModal from './(components)/signupPromptModal/SignupPromptModal';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  return (
+    <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 min-h-screen flex flex-col overflow-x-hidden">
+      {/* Navbar with signup modal handler */}
+      <Navbar onSignupClick={openModal} />
+
+      {/* Main Content */}
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <section className="relative flex flex-col items-center justify-center text-center py-48 px-4">
+          {/* Background Effect */}
+          <motion.div
+            className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-100/30 to-transparent opacity-70 blur-2xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 2 }}
+          />
+
+          <motion.h1
+            className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-400 text-transparent bg-clip-text mb-6"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1 }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Build the Future
+          </motion.h1>
+
+          <motion.p
+            className="text-2xl text-blue-500 max-w-3xl mb-8"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
           >
-            Read our docs
-          </a>
-        </div>
+            Create, launch, and scale your project with a platform that feels like magic.
+          </motion.p>
+
+          {/* Get Started Button */}
+          <button
+            onClick={() => {
+              console.log('Button clicked');
+              openModal();
+            }}
+            className="px-8 py-4 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-lg font-bold shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300 ease-in-out"
+            style={{ zIndex: 10 }} // Add a higher z-index to the button
+          >
+            Get Started
+          </button>
+        </section>
+
+        {/* Features Section */}
+        <section id="features" className="py-32 bg-white">
+          <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-3 gap-16 text-center">
+            {['Fast', 'Elegant', 'Scalable'].map((feature, idx) => (
+              <motion.div
+                key={idx}
+                className="p-8 rounded-3xl shadow-md hover:shadow-2xl transition-all bg-gradient-to-tr from-blue-50 to-cyan-50"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.2 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <h3 className="text-2xl font-bold text-blue-700 mb-4">{feature}</h3>
+                <p className="text-blue-400">
+                  {feature === "Fast" && "Built for speed and efficiency from the ground up."}
+                  {feature === "Elegant" && "Sophisticated design meets effortless functionality."}
+                  {feature === "Scalable" && "From startups to enterprises, we grow with you."}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* About Section */}
+        <section id="about" className="py-32 bg-gradient-to-r from-cyan-50 to-white">
+          <div className="max-w-5xl mx-auto text-center px-6">
+            <motion.h2
+              className="text-5xl font-bold text-blue-700 mb-8"
+              initial={{ x: -50, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              About Us
+            </motion.h2>
+            <motion.p
+              className="text-xl text-blue-400"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Our mission is to create digital experiences that feel intuitive, effortless, and extraordinary.
+            </motion.p>
+          </div>
+        </section>
+
+        {/* Contact Section */}
+        <section id="contact" className="py-32 bg-white">
+          <div className="max-w-4xl mx-auto text-center px-6">
+            <motion.h2
+              className="text-5xl font-bold text-blue-700 mb-6"
+              initial={{ scale: 0.8, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              Let's Connect
+            </motion.h2>
+            <motion.p
+              className="text-lg text-blue-400 mb-8"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              Whether you’re curious about features or just want to chat — we’re here for it.
+            </motion.p>
+
+            <motion.a
+              href="/contact"
+              className="px-6 py-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white text-lg font-bold shadow-md hover:scale-110 hover:shadow-2xl transition-all duration-300 ease-in-out"
+              whileHover={{ scale: 1.1 }}
+            >
+              Contact Us
+            </motion.a>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+      {/* Footer */}
+      <Footer />
+
+      {/* Signup Prompt Modal */}
+      {isModalOpen && (
+        <SignupPromptModal isOpen={isModalOpen} closeModal={closeModal} />
+      )}
     </div>
   );
 }

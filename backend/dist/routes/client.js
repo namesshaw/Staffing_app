@@ -25,7 +25,7 @@ const PROJECT = zod_1.default.object({
     roomid: zod_1.default.string().optional(),
     budget: zod_1.default.number().multipleOf(0.1),
     timeline: zod_1.default.number(),
-    required_developers: zod_1.default.number()
+    required_developers: zod_1.default.number(),
 });
 const USER_BODY = zod_1.default.object({
     name: zod_1.default.string(),
@@ -33,11 +33,11 @@ const USER_BODY = zod_1.default.object({
     company: zod_1.default.string(),
     password: zod_1.default.string(),
     phone: zod_1.default.string(),
-    rating: zod_1.default.number().multipleOf(0.01)
+    rating: zod_1.default.number().multipleOf(0.01),
 });
 const SIGNINBODY = zod_1.default.object({
     email: zod_1.default.string().email(),
-    password: zod_1.default.string()
+    password: zod_1.default.string(),
 });
 router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const parsedUser = USER_BODY.safeParse(req.body);
@@ -56,85 +56,109 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
             },
         });
         const token = jsonwebtoken_1.default.sign({
-            userId: user.id
+            userId: user.id,
         }, 
         //@ts-ignore
         process.env.JWT_SECRET);
         return void res.status(200).json({
-            token: token
+            token: token,
         });
     }
     catch (error) {
         return void res.status(500).json({ error: "Internal Server Error" });
     }
 }));
+router.get("/info", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return void res.status(202).json(req.user);
+    }
+    catch (e) {
+        console.log(e);
+        return void res.status(504).json({
+            message: "Cant fetch info"
+        });
+    }
+}));
 router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const parsedSignin = SIGNINBODY.safeParse(req.body);
     if (!parsedSignin.success) {
         return void res.status(400).json({
-            error: "Inputs format not correct should be handled in frontend itself"
+            error: "Inputs format not correct should be handled in frontend itself",
         });
     }
     const user = yield db_1.default.user.findFirst({
         where: {
-            email: parsedSignin.data.email
-        }
+            email: parsedSignin.data.email,
+        },
     });
     if (!user) {
         return void res.status(400).json({
-            error: "You are not signedup yet"
+            error: "You are not signedup yet",
         });
     }
     if (user.password === parsedSignin.data.password) {
         const token = jsonwebtoken_1.default.sign({
-            userId: user.id
-        }
+            userId: user.id,
+        }, 
         //@ts-ignore
-        , process.env.JWT_SECRET);
+        process.env.JWT_SECRET);
         return void res.status(200).json({
-            token: token
+            token: token,
         });
     }
     return void res.status(400).json({
-        error: "Please check your email or password"
+        error: "Please check your email or password",
     });
 }));
 router.post("/addproject", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    console.log("Indide");
     const parsedProject = PROJECT.safeParse(req.body);
     if (!parsedProject.success) {
-        console.log("pindinde");
-        console.log(req);
-        return void res.status(400).json({});
+        return void res.status(400).json({
+            message: "Invalid inputs",
+        });
     }
     const created_by = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
-    if (!created_by) {
-        return void res.status(400).json({
-            error: "Unimaginable"
-        });
-    }
     try {
-        console.log(created_by);
-        const project = yield db_1.default.project.create({
-            data: {
-                name: parsedProject.data.name,
-                roomid: parsedProject.data.roomid,
-                created_by: created_by,
-                budget: parsedProject.data.budget,
-                timeline: parsedProject.data.timeline,
-                required_developers: parsedProject.data.required_developers
+        if (created_by) {
+            const room = yield db_1.default.room.create({
+                data: {
+                    admin: created_by,
+                },
+            });
+            if (room) {
+                const project = yield db_1.default.project.create({
+                    data: {
+                        name: parsedProject.data.name,
+                        roomid: room.Roomid,
+                        created_by: created_by,
+                        budget: parsedProject.data.budget,
+                        timeline: parsedProject.data.timeline,
+                        required_developers: parsedProject.data.required_developers,
+                    },
+                });
+                console.log(project);
+                return void res.status(200).json({
+                    message: project,
+                    room: room,
+                });
             }
-        });
-        console.log(project);
-        return void res.status(200).json({
-            message: project
-        });
+            else {
+                return void res.status(400).json({
+                    message: "Room not created hence project not created",
+                });
+            }
+        }
+        else {
+            return void res.status(400).json({
+                message: "Relogin as created by not available",
+            });
+        }
     }
     catch (error) {
         console.log(error);
         return void res.status(400).json({
-            error: error
+            error: error,
         });
     }
 }));

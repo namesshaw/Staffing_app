@@ -3,8 +3,14 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-
+import { useRouter } from 'next/navigation';
+import { setAuthCookie } from '../../_cookies/cookies'
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { login } from '@/public/features/authSlice';
 export default function UserSignup() {
+  const dispatch = useDispatch()
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,11 +26,34 @@ export default function UserSignup() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted', formData);
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
+    console.log('Developer Signin:', formData);
+    try{
+        const response = await axios.post(`http://localhost:3000/api/v1/client/signup`, {
+          name: formData.name,
+          email: formData.email,
+          company: formData.company,
+          password: formData.password,
+          phone: formData.phone,
+        });
+        if(!response.data){
+           console.log("NULL")
+            alert("OPOPS")
+            return;
+        }
+        const token = response.data.token
+        localStorage.setItem("token", response.data.token);
+        setAuthCookie(response.data.token);
+        dispatch(login({token: token,
+          isAuthenticated:true,
+         username:formData.email
+        }))
+        router.push('/clienthome')
+    }catch(e){
+      console.log(e)
+      alert("Something went wrong")
+    }
   };
 
   return (

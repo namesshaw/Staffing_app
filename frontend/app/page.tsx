@@ -1,149 +1,51 @@
-'use client';
+import LandingPage from './(components)/landing/landing';
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import Navbar from './(components)/navbar/Navbar';
-import Footer from './(components)/footer/Footer';
-import SignupPromptModal from './(components)/signupPromptModal/SignupPromptModal';
+const verifyAuth = async () => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
 
-export default function Home() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+    if (!token) {
+      return null;
+    }
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+    // Server-side fetch call
+    const response = await fetch("http:localhost:3000/api/v1/verify", {
+      headers: {
+        Authorization: token,
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store' // Disable cache for authentication checks
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Auth verification failed:', error);
+    return null;
+  }
+};
+
+export default async function Home() {
+  const auth = await verifyAuth();
+
+  if (auth?.user) {
+    redirect('/client/home');
+  }
+  
+  if (auth?.developer) {
+    redirect('/developer/home');
+  }
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 min-h-screen flex flex-col overflow-x-hidden">
-      {/* Navbar with signup modal handler */}
-      <Navbar onSignupClick={openModal} />
-
-      {/* Main Content */}
-      <main className="flex-grow">
-        {/* Hero Section */}
-        <section className="relative flex flex-col items-center justify-center text-center py-48 px-4">
-          {/* Background Effect */}
-          <motion.div
-            className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-100/30 to-transparent opacity-70 blur-2xl"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 2 }}
-          />
-
-          <motion.h1
-            className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-400 text-transparent bg-clip-text mb-6"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1 }}
-          >
-            Build the Future
-          </motion.h1>
-
-          <motion.p
-            className="text-2xl text-blue-500 max-w-3xl mb-8"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            Create, launch, and scale your project with a platform that feels like magic.
-          </motion.p>
-
-          {/* Get Started Button */}
-          <button
-            onClick={() => {
-              console.log('Button clicked');
-              openModal();
-            }}
-            className="px-8 py-4 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-lg font-bold shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300 ease-in-out"
-            style={{ zIndex: 10 }} // Add a higher z-index to the button
-          >
-            Get Started
-          </button>
-        </section>
-
-        {/* Features Section */}
-        <section id="features" className="py-32 bg-white">
-          <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-3 gap-16 text-center">
-            {['Fast', 'Elegant', 'Scalable'].map((feature, idx) => (
-              <motion.div
-                key={idx}
-                className="p-8 rounded-3xl shadow-md hover:shadow-2xl transition-all bg-gradient-to-tr from-blue-50 to-cyan-50"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.2 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <h3 className="text-2xl font-bold text-blue-700 mb-4">{feature}</h3>
-                <p className="text-blue-400">
-                  {feature === "Fast" && "Built for speed and efficiency from the ground up."}
-                  {feature === "Elegant" && "Sophisticated design meets effortless functionality."}
-                  {feature === "Scalable" && "From startups to enterprises, we grow with you."}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* About Section */}
-        <section id="about" className="py-32 bg-gradient-to-r from-cyan-50 to-white">
-          <div className="max-w-5xl mx-auto text-center px-6">
-            <motion.h2
-              className="text-5xl font-bold text-blue-700 mb-8"
-              initial={{ x: -50, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              viewport={{ once: true }}
-            >
-              About Us
-            </motion.h2>
-            <motion.p
-              className="text-xl text-blue-400"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              Our mission is to create digital experiences that feel intuitive, effortless, and extraordinary.
-            </motion.p>
-          </div>
-        </section>
-
-        {/* Contact Section */}
-        <section id="contact" className="py-32 bg-white">
-          <div className="max-w-4xl mx-auto text-center px-6">
-            <motion.h2
-              className="text-5xl font-bold text-blue-700 mb-6"
-              initial={{ scale: 0.8, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              viewport={{ once: true }}
-            >
-              Let's Connect
-            </motion.h2>
-            <motion.p
-              className="text-lg text-blue-400 mb-8"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              Whether you’re curious about features or just want to chat — we’re here for it.
-            </motion.p>
-
-            <motion.a
-              href="/contact"
-              className="px-6 py-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white text-lg font-bold shadow-md hover:scale-110 hover:shadow-2xl transition-all duration-300 ease-in-out"
-              whileHover={{ scale: 1.1 }}
-            >
-              Contact Us
-            </motion.a>
-          </div>
-        </section>
-      </main>
-
-      {/* Footer */}
-      <Footer />
-
-      {/* Signup Prompt Modal */}
-      {isModalOpen && (
-        <SignupPromptModal isOpen={isModalOpen} closeModal={closeModal} />
-      )}
-    </div>
+    <main>
+      <LandingPage />
+    </main>
   );
 }

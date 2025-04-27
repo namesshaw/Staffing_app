@@ -1,9 +1,14 @@
 
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Inter } from 'next/font/google';
-const inter = Inter({ subsets: ['latin'] });
+import AuthInitializer from "./(components)/_AuthInitializer/page";
+import StoreProvider from "./StoreProvider";
+import { Suspense } from "react";
+// import { usePathname } from 'next/navigation';
+
+import ClientNavbarWrapper from "./(components)/_clientNavbarWrapper/page";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +21,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'MyLanding',
-  description: 'Next-gen platform',
+  title: "Archistudio",
+  description: "Designing spaces that inspire. Building dreams that last.",
 };
 
 export default function RootLayout({
@@ -25,10 +30,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      ><StoreProvider>
+        <AuthInitializer/>
+        <Suspense>
+        <ClientNavbarWrapper/>
         {children}
+        </Suspense>
+        
+        </StoreProvider>
       </body>
     </html>
   );

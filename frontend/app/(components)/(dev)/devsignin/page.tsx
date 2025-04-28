@@ -6,13 +6,14 @@ import { motion } from 'framer-motion';
 import { setAuthCookie } from '../../_cookies/cookies'
 import Link from 'next/link';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch , useSelector} from 'react-redux';
 import { login } from '@/public/features/authSlice';
-
+import { RootState } from '../../../../public/store'
 
 export default function DeveloperSignin() {
   const dispatch = useDispatch()
   const router = useRouter();
+  const token = useSelector((state : RootState) => state.auth.token)
   const [formData, setFormData] = useState({ email: '', password: '' });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +48,7 @@ export default function DeveloperSignin() {
     }
   };
 
-  return (
+  return !token ?  (
     <div className="relative bg-gradient-to-br from-blue-100 via-white to-cyan-100 h-screen w-screen flex items-center justify-center overflow-hidden px-4">
       {/* Background Blobs */}
       <motion.div
@@ -126,5 +127,5 @@ export default function DeveloperSignin() {
         </p>
       </motion.div>
     </div>
-  );
+  ) : router.push('/home');
 }

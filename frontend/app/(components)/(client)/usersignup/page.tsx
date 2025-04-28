@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { setAuthCookie } from '../../_cookies/cookies'
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../../public/store'
 import { login } from '@/public/features/authSlice';
 import {User} from "../../../../../backend/src/interfaces"
+
 export default function UserSignup() {
   const dispatch = useDispatch()
   const router = useRouter();
@@ -20,7 +22,7 @@ export default function UserSignup() {
     phone: '',
     rating: 0
   });
-
+  const token = useSelector((state : RootState) => state.auth.token)
   const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +53,7 @@ export default function UserSignup() {
           isAuthenticated:true,
          username:formData.email
         }))
+        setSubmitted(true)
         router.push('/clienthome')
     }catch(e){
       console.log(e)
@@ -58,7 +61,7 @@ export default function UserSignup() {
     }
   };
 
-  return (
+  return  !token ? (
     <div className="relative bg-gradient-to-br from-blue-100 via-white to-cyan-100 h-screen w-screen flex items-center justify-center overflow-hidden px-4">
       {/* Background Animated Blobs */}
       <motion.div
@@ -105,7 +108,7 @@ export default function UserSignup() {
                       type={field === 'password' ? 'password' : field === 'email' ? 'email' : field === 'phone' ? 'tel' : 'text'}
                       name={field}
                       placeholder=" "
-                      value={(formData as any)[field]}
+                      value={formData[field as keyof typeof formData]}
                       onChange={handleChange}
                       required={['name', 'email', 'password'].includes(field)}
                       className="peer px-4 py-3 rounded-xl w-full border border-blue-200 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-300 outline-none bg-white text-sm shadow-sm placeholder-transparent"
@@ -140,5 +143,5 @@ export default function UserSignup() {
         </div>
       </motion.div>
     </div>
-  );
+  ) : router.push('/clienthome');
 }

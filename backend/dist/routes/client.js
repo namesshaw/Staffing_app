@@ -112,6 +112,7 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
 }));
 router.post("/addproject", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
+    debugger;
     const parsedProject = PROJECT.safeParse(req.body);
     if (!parsedProject.success) {
         return void res.status(400).json({
@@ -159,6 +160,47 @@ router.post("/addproject", Auth_1.userAuth, (req, res) => __awaiter(void 0, void
         console.log(error);
         return void res.status(400).json({
             error: error,
+        });
+    }
+}));
+router.put("/edit/:field", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const field = req.params.field;
+    const change = req.body.change;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    try {
+        const data = yield db_1.default.user.update({
+            where: { id: userId },
+            data: {
+                [field]: change,
+            },
+        });
+        return void res.status(200).json({
+            message: "Updated Successfully",
+        });
+    }
+    catch (e) {
+        console.log(e);
+        return void res.status(511).json({
+            message: "Failed to update",
+        });
+    }
+}));
+router.get("/myprojects", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    try {
+        const projects = yield db_1.default.user.findMany({
+            where: { id: userId },
+            select: { projects: true }
+        });
+        console.log(projects);
+        return void res.status(200).json(projects);
+    }
+    catch (e) {
+        console.log(e);
+        return void res.status(511).json({
+            message: "Couldnt get the projects"
         });
     }
 }));

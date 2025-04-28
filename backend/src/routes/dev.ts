@@ -17,7 +17,7 @@ const DEVELOPER = zod.object({
     email: zod.string(),
     phone: zod.string(),
     password: zod.string(),
-    rating: zod.number().optional().default(0),
+    rating: zod.number().optional(),
 });
 const SIGNINBODY = zod.object({
     email: zod.string(),
@@ -30,30 +30,38 @@ router.post("/signup", async (req, res) => {
             error: "Invalid Format",
         });
     }
-    const developer = await prismaClient.developer.create({
-        data: {
-            name: parsedDev.data.name,
-            YOE: parsedDev.data.YOE,
-            email: parsedDev.data.email,
-            phone: parsedDev.data.phone,
-            password: parsedDev.data.password,
-        },
-    });
-    if (!developer) {
-        return void res.status(400).json({
-            error: "Unable to create a record try after some time",
+    try{
+        const developer = await prismaClient.developer.create({
+            data: {
+                name: parsedDev.data.name,
+                YOE: parsedDev.data.YOE,
+                email: parsedDev.data.email,
+                phone: parsedDev.data.phone,
+                password: parsedDev.data.password,
+            },
+        });
+        if (!developer) {
+            return void res.status(400).json({
+                error: "Unable to create a record try after some time",
+            });
+        }
+        const token = jwt.sign(
+            {
+                userId: developer.id,
+            },
+            //@ts-ignore
+            process.env.DEV_JWT_SECRET
+        );
+        return void res.status(200).json({
+            token: token,
+        });
+    }catch(e){
+        console.log(e);
+        return void res.status(200).json({
+            message: "Something iswrong",
         });
     }
-    const token = jwt.sign(
-        {
-            userId: developer.id,
-        },
-        //@ts-ignore
-        process.env.DEV_JWT_SECRET
-    );
-    return void res.status(200).json({
-        token: token,
-    });
+    
 });
 router.post("/signin", async (req, res) => {
     const parsedsignin = SIGNINBODY.safeParse(req.body);
@@ -163,6 +171,7 @@ router.get("/info", devAuth, async (req, res) => {
 });
 
 router.put("/edit/:field", devAuth, async (req, res) => {
+    
     const field = req.params.field;
     const change = req.body.change;
     const devId = (req as any).developer?.id;
@@ -173,7 +182,8 @@ router.put("/edit/:field", devAuth, async (req, res) => {
                 [field]: change,
             },
         });
-        return void res.status(211).json({
+        return void res.status(200).json({
+            
             message: "Updated Successfully",
         });
     } catch (e) {

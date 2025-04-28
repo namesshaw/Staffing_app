@@ -5,14 +5,15 @@ import { motion } from 'framer-motion';
 import { setAuthCookie } from '../../_cookies/cookies'
 import Link from 'next/link';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../../public/store'
 import { login } from '@/public/features/authSlice';
 
 export default function UserSignin() {
   const dispatch = useDispatch()
   const router = useRouter();
   const [formData, setFormData] = useState({ email: '', password: '' });
-
+  const token = useSelector((state : RootState) => state.auth.token)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -22,7 +23,7 @@ export default function UserSignin() {
     e.preventDefault();
     console.log('Developer Signin:', formData);
     try{
-        const response = await axios.post(`http://localhost:3000/api/v1/dev/signin`, {
+        const response = await axios.post(`http://localhost:3000/api/v1/client/signin`, {
            email : formData.email,
            password : formData.password
         });
@@ -38,14 +39,14 @@ export default function UserSignin() {
           isAuthenticated:true,
          username:formData.email
         }))
-        router.push('/home')
+        router.push('/clienthome')
     }catch(e){
       console.log(e)
       alert("Something went wrong")
     }
   };
 
-  return (
+  return !token ?(
     <div className="relative bg-gradient-to-br from-blue-100 via-white to-cyan-100 h-screen w-screen flex items-center justify-center overflow-hidden px-4">
       {/* Background Blobs */}
       <motion.div
@@ -124,5 +125,5 @@ export default function UserSignin() {
         </p>
       </motion.div>
     </div>
-  );
+  )  : router.push('/clienthome');
 }

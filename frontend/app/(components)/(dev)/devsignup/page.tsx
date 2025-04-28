@@ -5,12 +5,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { setAuthCookie } from '../../_cookies/cookies'
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { login } from '@/public/features/authSlice';
 import {Developer} from "../../../../../backend/src/interfaces"
+import { RootState } from '../../../../public/store'
 export default function DeveloperSignup() {
   const dispatch = useDispatch()
     const router = useRouter();
+    const token = useSelector((state : RootState) => state.auth.token)
   const [formData, setFormData] = useState<Omit<Developer,"id">>({
     name: '',
     YOE: 0,
@@ -35,7 +37,7 @@ export default function DeveloperSignup() {
     try{
         const response = await axios.post(`http://localhost:3000/api/v1/dev/signup`, {
           name: formData.name,
-          YOE: formData.YOE,
+          YOE: Number(formData.YOE),
           email: formData.email,
           phone: formData.phone,
           password: formData.password,
@@ -52,6 +54,7 @@ export default function DeveloperSignup() {
           isAuthenticated:true,
          username:formData.email
         }))
+        setSubmitted(true)
         router.push('/home')
     }catch(e){
       console.log(e)
@@ -59,7 +62,7 @@ export default function DeveloperSignup() {
     }
   };
 
-  return (
+  return !token ?  (
     <div className="relative bg-gradient-to-br from-blue-100 via-white to-cyan-100 h-screen w-screen flex items-center justify-center overflow-hidden px-4">
       {/* Background animated blobs */}
       <motion.div
@@ -106,7 +109,7 @@ export default function DeveloperSignup() {
                       type={field === 'password' ? 'password' : field === 'email' ? 'email' : field === 'phone' ? 'tel' : field === 'YOE' ? 'number' : 'text'}
                       name={field}
                       placeholder=" "
-                      value={(formData as any)[field]}
+                      value={formData[field as keyof typeof formData]}
                       onChange={handleChange}
                       required={['name', 'email', 'phone', 'password'].includes(field)}
                       className="peer px-4 py-3 rounded-xl w-full border border-blue-200 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-300 outline-none bg-white text-sm shadow-sm placeholder-transparent"
@@ -143,5 +146,5 @@ export default function DeveloperSignup() {
         </div>
       </motion.div>
     </div>
-  );
+  ) : router.push('/home')
 }

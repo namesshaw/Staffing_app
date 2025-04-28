@@ -4,16 +4,19 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../navbar/Navbar';
 import Footer from '../footer/Footer';
+import { useRouter } from 'next/navigation';
+import {  useSelector } from 'react-redux';
 import SignupPromptModal from '../signupPromptModal/SignupPromptModal';
-
+import { RootState } from '../../../public/store'
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const token = useSelector((state : RootState) => state.auth.token)
   const openModal = () => setIsModalOpen(true);
+  const router = useRouter();
   const closeModal = () => setIsModalOpen(false);
 
-  return (
-    <div className="bg-gradient-to-br from-blue-400 via-blue-300 to-blue-400 min-h-screen flex flex-col overflow-x-hidden">
+  return !token ? (
+    <div className="bg-gradient-to-br from-teal-400 via-blue-300 to-blue-400 min-h-screen flex flex-col overflow-x-hidden">
       {/* Navbar with signup modal handler */}
       <Navbar onSignupClick={openModal} />
 
@@ -145,5 +148,5 @@ export default function Home() {
         <SignupPromptModal isOpen={isModalOpen} closeModal={closeModal} />
       )}
     </div>
-  );
+  ) : router.push('/home') ;
 }

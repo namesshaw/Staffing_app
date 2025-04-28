@@ -29,13 +29,14 @@ export default function DeveloperSignup() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    
+    console.log(formData)
     e.preventDefault();
     console.log('Developer Signin:', formData);
     try{
         const response = await axios.post(`http://localhost:3000/api/v1/dev/signup`, {
           name: formData.name,
-          YOE: formData.YOE,
+          YOE: 
+          formData,
           email: formData.email,
           phone: formData.phone,
           password: formData.password,

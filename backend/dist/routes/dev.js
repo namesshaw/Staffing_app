@@ -26,7 +26,7 @@ const DEVELOPER = zod_1.default.object({
     email: zod_1.default.string(),
     phone: zod_1.default.string(),
     password: zod_1.default.string(),
-    rating: zod_1.default.number().optional().default(0),
+    rating: zod_1.default.number().optional(),
 });
 const SIGNINBODY = zod_1.default.object({
     email: zod_1.default.string(),
@@ -39,28 +39,36 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
             error: "Invalid Format",
         });
     }
-    const developer = yield db_1.default.developer.create({
-        data: {
-            name: parsedDev.data.name,
-            YOE: parsedDev.data.YOE,
-            email: parsedDev.data.email,
-            phone: parsedDev.data.phone,
-            password: parsedDev.data.password,
-        },
-    });
-    if (!developer) {
-        return void res.status(400).json({
-            error: "Unable to create a record try after some time",
+    try {
+        const developer = yield db_1.default.developer.create({
+            data: {
+                name: parsedDev.data.name,
+                YOE: parsedDev.data.YOE,
+                email: parsedDev.data.email,
+                phone: parsedDev.data.phone,
+                password: parsedDev.data.password,
+            },
+        });
+        if (!developer) {
+            return void res.status(400).json({
+                error: "Unable to create a record try after some time",
+            });
+        }
+        const token = jsonwebtoken_1.default.sign({
+            userId: developer.id,
+        }, 
+        //@ts-ignore
+        process.env.DEV_JWT_SECRET);
+        return void res.status(200).json({
+            token: token,
         });
     }
-    const token = jsonwebtoken_1.default.sign({
-        userId: developer.id,
-    }, 
-    //@ts-ignore
-    process.env.DEV_JWT_SECRET);
-    return void res.status(200).json({
-        token: token,
-    });
+    catch (e) {
+        console.log(e);
+        return void res.status(200).json({
+            message: "Something iswrong",
+        });
+    }
 }));
 router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const parsedsignin = SIGNINBODY.safeParse(req.body);
@@ -176,7 +184,7 @@ router.put("/edit/:field", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 
                 [field]: change,
             },
         });
-        return void res.status(211).json({
+        return void res.status(200).json({
             message: "Updated Successfully",
         });
     }

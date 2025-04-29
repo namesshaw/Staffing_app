@@ -12,6 +12,8 @@ router.use("/client", clientRouter)
 router.use("/dev", devRouter)
 
 router.get("/verify", async(req, res) => {
+    
+    console.log(req.headers.authorization)
     const token = req.headers.authorization;
     if(!token){
         return void res.status(401).json({

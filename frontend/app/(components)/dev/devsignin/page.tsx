@@ -1,16 +1,19 @@
 'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { setAuthCookie } from '../../_cookies/cookies'
 import Link from 'next/link';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch , useSelector} from 'react-redux';
 import { login } from '@/public/features/authSlice';
+import { RootState } from '../../../../public/store'
 
-export default function UserSignin() {
+export default function DeveloperSignin() {
   const dispatch = useDispatch()
   const router = useRouter();
+  const token = useSelector((state : RootState) => state.auth.token)
   const [formData, setFormData] = useState({ email: '', password: '' });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,7 +21,7 @@ export default function UserSignin() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     console.log('Developer Signin:', formData);
     try{
@@ -45,7 +48,7 @@ export default function UserSignin() {
     }
   };
 
-  return (
+  return !token ?  (
     <div className="relative bg-gradient-to-br from-blue-100 via-white to-cyan-100 h-screen w-screen flex items-center justify-center overflow-hidden px-4">
       {/* Background Blobs */}
       <motion.div
@@ -66,7 +69,7 @@ export default function UserSignin() {
         transition={{ duration: 0.6 }}
       >
         <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 text-center mb-6">
-          User Sign In
+          Developer Sign In
         </h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -117,12 +120,12 @@ export default function UserSignin() {
         </form>
 
         <p className="text-center text-blue-400 mt-5 text-xs">
-          New here?{' '}
-          <Link href="/usersignup" className="text-cyan-500 font-semibold hover:underline">
+          New Developer?{' '}
+          <Link href="/devsignup" className="text-cyan-500 font-semibold hover:underline">
             Create Account
           </Link>
         </p>
       </motion.div>
     </div>
-  );
+  ) : router.push('/home');
 }

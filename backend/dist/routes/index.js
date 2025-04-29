@@ -22,6 +22,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 router.use("/client", client_1.default);
 router.use("/dev", dev_1.default);
 router.get("/verify", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.headers.authorization);
     const token = req.headers.authorization;
     if (!token) {
         return void res.status(401).json({

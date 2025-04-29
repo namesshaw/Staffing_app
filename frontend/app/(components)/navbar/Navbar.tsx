@@ -21,9 +21,13 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const islogin = useSelector((state:RootState)=>state.auth.isAuthenticated)
   
+  
 
   async function handlelogout() {
+    
+    
     dispatch(logout())
+    router.push("/")
   }
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -36,7 +40,7 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
       transition={{ type: "spring", stiffness: 80 }}
     >
       {/* Logo */}
-      <Link href="/" className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-400 text-transparent bg-clip-text animate-pulse">
+      <Link href="/" className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-700 text-transparent bg-clip-text animate-pulse">
         StaffingUp
       </Link>
 
@@ -70,16 +74,10 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
         </button>
       </div>):
       (<div>
-        <button
-         onClick={()=>router.push("/myprofile")}
-          className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-md hover:shadow-2xl hover:scale-105 transition font-semibold"
-        >
-          Profile
-
-        </button>
+        
          <button
          onClick={handlelogout}
-          className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-md hover:shadow-2xl hover:scale-105 transition font-semibold"
+          className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md hover:shadow-2xl hover:scale-105 transition font-semibold"
         >
           Logout
 

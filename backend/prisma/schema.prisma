@@ -27,7 +27,7 @@ model User {
 }
 
 model Developer {
-  id             String    @id @default(cuid())
+  id             String    @id @default(uuid())
   name           String
   YOE            Float
   email          String    @unique
@@ -65,7 +65,7 @@ model Project {
   budget              Float
   timeline            Int
   required_developers Int
-  Assigned_developers Developer[]
+  Assigned_developers Developer[] 
   room                Room?        @relation(fields: [roomid], references: [Roomid])
   createdby           User        @relation(fields: [created_by], references: [id])
 }

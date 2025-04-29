@@ -1,30 +1,29 @@
 'use client';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { setAuthCookie } from '../../_cookies/cookies'
 import Link from 'next/link';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../../public/store'
 import { login } from '@/public/features/authSlice';
 
-
-export default function DeveloperSignin() {
+export default function UserSignin() {
   const dispatch = useDispatch()
   const router = useRouter();
   const [formData, setFormData] = useState({ email: '', password: '' });
-
+  const token = useSelector((state : RootState) => state.auth.token)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Developer Signin:', formData);
     try{
-        const response = await axios.post(`http://localhost:3000/api/v1/dev/signin`, {
+        const response = await axios.post(`http://localhost:3000/api/v1/client/signin`, {
            email : formData.email,
            password : formData.password
         });
@@ -40,14 +39,14 @@ export default function DeveloperSignin() {
           isAuthenticated:true,
          username:formData.email
         }))
-        router.push('/home')
+        router.push('/clienthome')
     }catch(e){
       console.log(e)
       alert("Something went wrong")
     }
   };
 
-  return (
+  return !token ?(
     <div className="relative bg-gradient-to-br from-blue-100 via-white to-cyan-100 h-screen w-screen flex items-center justify-center overflow-hidden px-4">
       {/* Background Blobs */}
       <motion.div
@@ -68,7 +67,7 @@ export default function DeveloperSignin() {
         transition={{ duration: 0.6 }}
       >
         <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 text-center mb-6">
-          Developer Sign In
+          User Sign In
         </h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -119,12 +118,12 @@ export default function DeveloperSignin() {
         </form>
 
         <p className="text-center text-blue-400 mt-5 text-xs">
-          New Developer?{' '}
-          <Link href="/devsignup" className="text-cyan-500 font-semibold hover:underline">
+          New here?{' '}
+          <Link href="/usersignup" className="text-cyan-500 font-semibold hover:underline">
             Create Account
           </Link>
         </p>
       </motion.div>
     </div>
-  );
+  )  : router.push('/clienthome');
 }

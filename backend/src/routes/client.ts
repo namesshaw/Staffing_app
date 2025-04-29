@@ -108,10 +108,8 @@ router.post("/signin", async (req: Request, res: Response) => {
     error: "Please check your email or password",
   });
 });
-router.post(
-  "/addproject",
-  userAuth,
-  async (req: UserRequest, res: Response) => {
+router.post("/addproject",userAuth ,async (req: UserRequest, res: Response) => {
+  debugger
     const parsedProject = PROJECT.safeParse(req.body);
     if (!parsedProject.success) {
       return void res.status(400).json({
@@ -160,5 +158,45 @@ router.post(
     }
   }
 );
+router.put("/edit/:field", userAuth, async (req, res) => {
+    
+  const field = req.params.field;
+  const change = req.body.change;
+  const userId = (req as any).user?.id;
+  try {
+      const data = await prismaClient.user.update({
+          where: { id: userId },
+          data: {
+              [field]: change,
+          },
+      });
+      return void res.status(200).json({
+          
+          message: "Updated Successfully",
+      });
+  } catch (e) {
+      console.log(e);
+      return void res.status(511).json({
+          message: "Failed to update",
+      });
+  }
+});
 
+router.get("/myprojects", userAuth, async (req, res) => {
+  const userId = (req as any).user?.id;
+  try {
+      const projects = await prismaClient.user.findMany({
+          where: { id: userId },
+          select : {projects : true}
+      })
+      console.log(projects)
+      return void res.status(200).json(projects)
+  } catch (e) {
+      console.log(e);
+      return void res.status(511).json({
+          message: "Couldnt get the projects"
+      })
+  }
+
+});
 export default router;

@@ -1,51 +1,78 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Pencil } from 'lucide-react'; // using Lucide icons
-
+import axios from 'axios';
 import Footer from '../../footer/Footer';
-import SignupPromptModal from '../../signupPromptModal/SignupPromptModal';
+import { User } from '../../../../../backend/src/interfaces';
 
-interface Developer {
-  id: string;
-  name: string;
-  YOE: number;
-  email: string;
-  phone: string;
-  password: string;
-  rating: number;
-}
+
 
 export default function ProfilePage() {
-  const [developer, setDeveloper] = useState<Developer>({
-    id: 'dev123',
+  const [User, setUser] = useState<User>({
     name: 'John Doe',
-    YOE: 5,
+    company: "xyz",
     email: 'john@example.com',
     phone: '+1234567890',
     password: '********',
     rating: 4.5,
+    id: "x"
   });
 
-  const [isEditing, setIsEditing] = useState<keyof Developer | null>(null);
+  const [isEditing, setIsEditing] = useState<keyof User | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+ 
+  useEffect(() => {
+      getData();
+      
+    },[User])
+    const getData = async() => {
+       
+       try{
+        const response = await axios.get('http://localhost:3000/api/v1/client/info');
+        const data = response.data ;
+        setUser({
+          name: data.name,
+          company: data.company || "Default Company",
+          email: data.email,
+          phone: data.phone,
+          password: data.password,
+          rating: data.rating,
+          id: data.id || "Default ID"
+        })
+  
+       }catch(e){
+        console.log(e);
+        alert("Something went wrong")
+       }
+    }
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
-  const startEditing = (field: keyof Developer) => {
+  const startEditing = (field: keyof User) => {
     setIsEditing(field);
-    setTempValue(developer[field].toString());
+    setTempValue(User[field].toString());
   };
 
-  const saveEdit = () => {
-    if (isEditing) {
-      setDeveloper(prev => ({
-        ...prev,
-        [isEditing]: isEditing === 'YOE' || isEditing === 'rating' ? Number(tempValue) : tempValue,
-      }));
+  const saveEdit = async() => {
+
+    if (isEditing){
+      console.log(isEditing)
+    try{
+    
+      const res = await axios.put(`http://localhost:3000/api/v1/client/edit/${isEditing}`, 
+         {change : tempValue}
+      )
+      if(res.status === 200){
+        setUser(prev => ({
+          ...prev,
+          [isEditing]: tempValue,
+        }));
+      }
+
+    }catch(e){
+      console.error(e);
+      alert("Something went wrong")
+    }
     }
     setIsEditing(null);
   };
@@ -73,31 +100,33 @@ export default function ProfilePage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1 }}
           >
-            Developer Profile
+            User Profile
           </motion.h1>
 
           {/* Profile Card */}
           <div className="bg-white/30 backdrop-blur-2xl rounded-3xl shadow-2xl p-10 max-w-3xl w-full text-left space-y-8 border border-white/50">
-            {Object.entries(developer).map(([key, value], idx) => (
+            {Object.entries(User).filter(([key]) => key !== 'id').map(([key, value], idx) =>  (
+              
               <motion.div
-                key={key}
+                key={key }
                 className="flex justify-between items-center border-b border-white/30 pb-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
               >
                 <div>
-                  <p className="text-sm text-gray-200 capitalize">{key}</p>
+                  <p className="text-sm text-gray-200 capitalize">{key }</p>
                   <p className="text-2xl font-semibold text-white tracking-wide">
                     {value}
                   </p>
                 </div>
+                {key !== 'rating' && (
                 <button
-                  onClick={() => startEditing(key as keyof Developer)}
+                  onClick={() => startEditing(key as keyof User)}
                   className="p-2 rounded-full hover:bg-white/20 transition-all"
                 >
                   <Pencil className="text-white" size={20} />
-                </button>
+                </button>)}
               </motion.div>
             ))}
           </div>
@@ -137,9 +166,6 @@ export default function ProfilePage() {
       <Footer />
 
       {/* Signup Prompt Modal */}
-      {isModalOpen && (
-        <SignupPromptModal isOpen={isModalOpen} closeModal={closeModal} />
-      )}
     </div>
   );
 }

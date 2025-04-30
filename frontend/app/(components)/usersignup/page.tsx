@@ -55,8 +55,10 @@ export default function UserSignup() {
         setAuthCookie(response.data.token);
         dispatch(login({token: token,
           isAuthenticated:true,
-         username:formData.email,
-         role:role
+          email : formData.email,
+         username:formData.name,
+         role:role,
+         userId : response.data.userId
         }))
         setSubmitted(true)
         router.push('client/home')

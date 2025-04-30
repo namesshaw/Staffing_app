@@ -48,4 +48,20 @@ router.get("/logout", async(req, res)=>{
   
     res.status(200).json({ message: 'Logged out successfully' });
 })
+router.get("/chatroom/:roomId", async(req, res)=>{
+    const roomId = req.params.roomId;
+    try{
+      const chats = await prismaClient.chat.findMany({
+        where : {room_id : roomId}
+      });
+    //   console.log(chats)
+      return void res.status(200).json(chats)
+      
+    }catch(e){
+      console.log(e);
+      return void res.status(511).json({
+          message: "Couldnt get the chats"
+      })
+    }
+})
 export default router

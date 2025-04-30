@@ -19,6 +19,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const dev_1 = __importDefault(require("./dev"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const db_1 = __importDefault(require("../db/db"));
 router.use("/client", client_1.default);
 router.use("/dev", dev_1.default);
 router.get("/verify", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -56,5 +57,21 @@ router.get("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function* 
     res.clearCookie('token', { httpOnly: true, secure: false, path: '/' });
     res.clearCookie('role', { httpOnly: true, secure: false, path: '/' });
     res.status(200).json({ message: 'Logged out successfully' });
+}));
+router.get("/chatroom/:roomId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const roomId = req.params.roomId;
+    try {
+        const chats = yield db_1.default.chat.findMany({
+            where: { room_id: roomId }
+        });
+        //   console.log(chats)
+        return void res.status(200).json(chats);
+    }
+    catch (e) {
+        console.log(e);
+        return void res.status(511).json({
+            message: "Couldnt get the chats"
+        });
+    }
 }));
 exports.default = router;

@@ -79,9 +79,17 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
             sameSite: 'strict',
             path: '/',
         });
+        res.cookie('userId', user.id, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+        });
         return void res.status(200).json({
             token: token,
-            role: role
+            role: role,
+            userId: user.id,
+            username: user.name
         });
     }
     catch (error) {
@@ -137,7 +145,9 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
         return void res.status(200).json({
             token: token,
-            role: role
+            role: role,
+            userId: user.id,
+            username: user.name
         });
     }
     return void res.status(400).json({
@@ -254,15 +264,24 @@ router.put("/edit/:field", Auth_1.userAuth, (req, res) => __awaiter(void 0, void
     }
 }));
 router.get("/myprojects", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    const username = (_b = req.user) === null || _b === void 0 ? void 0 : _b.name;
     try {
         const projects = yield db_1.default.user.findMany({
             where: { id: userId },
-            select: { projects: true }
+            select: {
+                name: true,
+                projects: true
+            }
         });
-        console.log(projects);
-        return void res.status(200).json(projects);
+        const response = {
+            username: projects[0].name,
+            projects: projects[0].projects
+        };
+        console.log(response);
+        // projects[0].projects.
+        return void res.status(200).json(response);
     }
     catch (e) {
         console.log(e);
@@ -270,7 +289,5 @@ router.get("/myprojects", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 
             message: "Couldnt get the projects"
         });
     }
-}));
-router.post("/addskills", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 exports.default = router;

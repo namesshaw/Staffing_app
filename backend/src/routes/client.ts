@@ -12,7 +12,7 @@ interface UserRequest extends Request {
 }
 
 import prismaClient from "../db/db";
-import { isArrayLiteralExpression } from "typescript";
+
 const router = express.Router();
 const SKILL_SCHEMA = zod.object({
   name: zod.string(),
@@ -76,9 +76,17 @@ const role = "client"
       sameSite: 'strict',
       path: '/',
     });
+    res.cookie('userId', user.id, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+    });
     return void res.status(200).json({
       token: token,
-      role: role
+      role: role,
+      userId : user.id,
+      username : user.name
     });
   } catch (error) {
     return void res.status(500).json({ error: "Internal Server Error" });
@@ -137,7 +145,9 @@ router.post("/signin", async (req: Request, res: Response) => {
     });
     return void res.status(200).json({
       token: token,
-      role: role
+      role: role,
+      userId : user.id,
+      username : user.name
     });
   }
   
@@ -260,13 +270,21 @@ router.put("/edit/:field", userAuth, async (req, res) => {
 
 router.get("/myprojects", userAuth, async (req, res) => {
   const userId = (req as any).user?.id;
+  const username = (req as any).user?.name;
   try {
       const projects = await prismaClient.user.findMany({
           where: { id: userId },
-          select : {projects : true}
+          select : {
+            name : true,
+            projects : true}
       })
-      console.log(projects)
-      return void res.status(200).json(projects)
+      const response = {
+        username: projects[0].name,
+        projects: projects[0].projects
+    };
+      console.log(response)
+      // projects[0].projects.
+      return void res.status(200).json(response)
   } catch (e) {
       console.log(e);
       return void res.status(511).json({
@@ -275,7 +293,5 @@ router.get("/myprojects", userAuth, async (req, res) => {
   }
 
 });
-router.post("/addskills", async(req, res)=>{
-  
-})
+
 export default router;

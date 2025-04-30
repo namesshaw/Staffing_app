@@ -73,10 +73,12 @@ model Project {
 
 model Chat {
   id                 String @id @default(uuid())
-  room_id            String @unique
-  message_created_by String @unique
+  room_id            String 
+  message_created_by String 
+  name_of_creator    String @default("temp")
   room               Room   @relation(fields: [room_id], references: [Roomid])
-  createdby          String
+  message            String            
+  creation_time      DateTime @default(now())
 }
 
 model ProjectSkill{

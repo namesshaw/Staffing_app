@@ -2,10 +2,12 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 
 interface Project {
   id: string
   name: string
+  roomid : string
   budget: number
   timeline: number
   required_developers: number
@@ -19,12 +21,15 @@ export default function YourProjects() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-
+  
+  const [creatorName, setCreatorName] = useState("")
+  const router = useRouter()
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get('http://localhost:3000/api/v1/client/myprojects')
-        setProjects(response.data[0].projects)
+        setProjects(response.data.projects)
+        setCreatorName(response.data.username)
         setLoading(false)
       } catch (err) {
         setError('Failed to fetch projects')
@@ -32,7 +37,9 @@ export default function YourProjects() {
         console.log(err)
       }
     }
-
+    // const getUsername = async() => {
+    //   try{}
+    // }
     fetchProjects()
   }, [])
 
@@ -72,6 +79,10 @@ export default function YourProjects() {
                 <h2 className="text-2xl font-semibold text-white mb-4">{project.name}</h2>
 
                 <div className="space-y-3">
+                <div className="flex justify-between">
+                    <span className="text-gray-200">Created By:</span>
+                    <span className="font-medium text-white">{creatorName} </span>
+                  </div>
                   <div className="flex justify-between">
                     <span className="text-gray-200">Budget:</span>
                     <span className="font-medium text-white">${project.budget}</span>
@@ -86,7 +97,14 @@ export default function YourProjects() {
                     <span className="text-gray-200">Required Developers:</span>
                     <span className="font-medium text-white">{project.required_developers}</span>
                   </div>
-
+                  <div>
+                  <button
+                    onClick={() => router.push(`/chat/${project.roomid}/view`)}
+                    className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md hover:shadow-2xl hover:scale-105 transition font-semibold"
+                  >
+                    View Chats
+                  </button>
+                  </div>
                   {/* Optional: Assigned Developers */}
                   {/* <div className="border-t pt-3 mt-3">
                     <h3 className="text-gray-200 mb-2">Assigned Developers:</h3>
@@ -110,7 +128,7 @@ export default function YourProjects() {
 
         {projects.length === 0 && (
           <div className="text-center text-white">
-            <p className="text-xl">You haven't created any projects yet.</p>
+            <p className="text-xl">You havent created any projects yet.</p>
           </div>
         )}
       </div>

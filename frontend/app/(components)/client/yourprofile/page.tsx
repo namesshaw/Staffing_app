@@ -6,8 +6,8 @@ import { Pencil } from 'lucide-react'; // using Lucide icons
 import axios from 'axios';
 import Footer from '../../footer/Footer';
 import { User } from '../../../../../backend/src/interfaces';
-
-
+import { useSelector } from 'react-redux';
+import { RootState } from '@/public/store';
 
 export default function ProfilePage() {
   const [User, setUser] = useState<User>({
@@ -19,68 +19,67 @@ export default function ProfilePage() {
     rating: 4.5,
     id: "x"
   });
-
+  const token = useSelector((state: RootState)=>state.auth.token)
   const [isEditing, setIsEditing] = useState<keyof User | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
- 
+
   useEffect(() => {
-      getData();
-      
-    },[User])
-    const getData = async() => {
-       
-       try{
-        const response = await axios.get('http://localhost:3000/api/v1/client/info');
-        const data = response.data ;
-        setUser({
-          name: data.name,
-          company: data.company || "Default Company",
-          email: data.email,
-          phone: data.phone,
-          password: data.password,
-          rating: data.rating,
-          id: data.id || "Default ID"
-        })
-  
-       }catch(e){
-        console.log(e);
-        alert("Something went wrong")
-       }
+    getData();
+  }, [User]);
+
+  const getData = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/v1/client/info',
+        {
+          headers: {
+            Authorization: token,
+          }
+        }
+      );
+      const data = response.data;
+      setUser({
+        name: data.name,
+        company: data.company || "Default Company",
+        email: data.email,
+        phone: data.phone,
+        password: data.password,
+        rating: data.rating,
+        id: data.id || "Default ID"
+      });
+    } catch (e) {
+      console.log(e);
+      alert("Something went wrong");
     }
+  };
 
   const startEditing = (field: keyof User) => {
     setIsEditing(field);
     setTempValue(User[field].toString());
   };
 
-  const saveEdit = async() => {
-
-    if (isEditing){
-      console.log(isEditing)
-    try{
-    
-      const res = await axios.put(`http://localhost:3000/api/v1/client/edit/${isEditing}`, 
-         {change : tempValue}
-      )
-      if(res.status === 200){
-        setUser(prev => ({
-          ...prev,
-          [isEditing]: tempValue,
-        }));
+  const saveEdit = async () => {
+    if (isEditing) {
+      console.log(isEditing);
+      try {
+        const res = await axios.put(`http://localhost:3000/api/v1/client/edit/${isEditing}`,
+          { change: tempValue }
+        );
+        if (res.status === 200) {
+          setUser(prev => ({
+            ...prev,
+            [isEditing]: tempValue,
+          }));
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Something went wrong");
       }
-
-    }catch(e){
-      console.error(e);
-      alert("Something went wrong")
-    }
     }
     setIsEditing(null);
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-400 via-blue-300 to-blue-400 min-h-screen flex flex-col overflow-x-hidden">
-      
-
+    <div className="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen flex flex-col overflow-x-hidden">
       {/* Main Content */}
       <main className="flex-grow">
         {/* Profile Section */}
@@ -105,28 +104,27 @@ export default function ProfilePage() {
 
           {/* Profile Card */}
           <div className="bg-white/30 backdrop-blur-2xl rounded-3xl shadow-2xl p-10 max-w-3xl w-full text-left space-y-8 border border-white/50">
-            {Object.entries(User).filter(([key]) => key !== 'id').map(([key, value], idx) =>  (
-              
+            {Object.entries(User).filter(([key]) => key !== 'id').map(([key, value], idx) => (
               <motion.div
-                key={key }
+                key={key}
                 className="flex justify-between items-center border-b border-white/30 pb-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
               >
                 <div>
-                  <p className="text-sm text-gray-200 capitalize">{key }</p>
+                  <p className="text-sm text-gray-200 capitalize">{key}</p>
                   <p className="text-2xl font-semibold text-white tracking-wide">
                     {value}
                   </p>
                 </div>
                 {key !== 'rating' && (
-                <button
-                  onClick={() => startEditing(key as keyof User)}
-                  className="p-2 rounded-full hover:bg-white/20 transition-all"
-                >
-                  <Pencil className="text-white" size={20} />
-                </button>)}
+                  <button
+                    onClick={() => startEditing(key as keyof User)}
+                    className="p-2 rounded-full hover:bg-white/20 transition-all"
+                  >
+                    <Pencil className="text-white" size={20} />
+                  </button>)}
               </motion.div>
             ))}
           </div>
@@ -164,8 +162,6 @@ export default function ProfilePage() {
 
       {/* Footer */}
       <Footer />
-
-      {/* Signup Prompt Modal */}
     </div>
   );
 }

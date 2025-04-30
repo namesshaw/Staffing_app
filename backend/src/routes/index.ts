@@ -12,6 +12,8 @@ router.use("/client", clientRouter)
 router.use("/dev", devRouter)
 
 router.get("/verify", async(req, res) => {
+    
+    console.log(req.headers.authorization)
     const token = req.headers.authorization;
     if(!token){
         return void res.status(401).json({
@@ -39,5 +41,11 @@ router.get("/verify", async(req, res) => {
         }
     }
     
+})
+router.get("/logout", async(req, res)=>{
+    res.clearCookie('token', { httpOnly: true, secure: false, path: '/' });
+    res.clearCookie('role', { httpOnly: true, secure: false, path: '/' });
+  
+    res.status(200).json({ message: 'Logged out successfully' });
 })
 export default router

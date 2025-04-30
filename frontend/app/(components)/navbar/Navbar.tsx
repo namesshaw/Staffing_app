@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/public/store';
 import { logout } from '@/public/features/authSlice';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 interface NavbarProps {
   onSignupClick: () => void;
@@ -26,8 +27,14 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
   async function handlelogout() {
     
     
-    dispatch(logout())
+    dispatch(logout()) 
+    const logout1 = await axios.get("http://localhost:3000/api/v1/logout",{
+      
+        withCredentials: true
+      
+    })
     router.push("/")
+    dispatch(logout())
   }
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);

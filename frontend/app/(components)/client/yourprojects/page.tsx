@@ -23,9 +23,7 @@ export default function YourProjects() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/v1/client/myprojects', {
-         
-        })
+        const response = await axios.get('http://localhost:3000/api/v1/client/myprojects')
         setProjects(response.data[0].projects)
         setLoading(false)
       } catch (err) {
@@ -57,10 +55,10 @@ export default function YourProjects() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-8 text-center">Your Projects</h1>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project, index) => (
             <motion.div
@@ -68,33 +66,34 @@ export default function YourProjects() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="bg-white rounded-lg shadow-xl overflow-hidden"
+              className="bg-white/30 backdrop-blur-2xl rounded-lg shadow-xl overflow-hidden"
             >
               <div className="p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">{project.name}</h2>
-                
+                <h2 className="text-2xl font-semibold text-white mb-4">{project.name}</h2>
+
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Budget:</span>
-                    <span className="font-medium">${project.budget}</span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Timeline:</span>
-                    <span className="font-medium">{project.timeline} days</span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Required Developers:</span>
-                    <span className="font-medium">{project.required_developers}</span>
+                    <span className="text-gray-200">Budget:</span>
+                    <span className="font-medium text-white">${project.budget}</span>
                   </div>
 
+                  <div className="flex justify-between">
+                    <span className="text-gray-200">Timeline:</span>
+                    <span className="font-medium text-white">{project.timeline} days</span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-gray-200">Required Developers:</span>
+                    <span className="font-medium text-white">{project.required_developers}</span>
+                  </div>
+
+                  {/* Optional: Assigned Developers */}
                   {/* <div className="border-t pt-3 mt-3">
-                    <h3 className="text-gray-600 mb-2">Assigned Developers:</h3>
+                    <h3 className="text-gray-200 mb-2">Assigned Developers:</h3>
                     {project.Assigned_developers.length > 0 ? (
                       <div className="space-y-1">
                         {project.Assigned_developers.map(dev => (
-                          <div key={dev.id} className="text-sm text-gray-800">
+                          <div key={dev.id} className="text-sm text-white">
                             {dev.name}
                           </div>
                         ))}
@@ -111,7 +110,7 @@ export default function YourProjects() {
 
         {projects.length === 0 && (
           <div className="text-center text-white">
-            <p className="text-xl">You havent created any projects yet.</p>
+            <p className="text-xl">You haven't created any projects yet.</p>
           </div>
         )}
       </div>

@@ -16,16 +16,22 @@ const express_1 = __importDefault(require("express"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const zod_1 = __importDefault(require("zod"));
 const Auth_1 = require("../middleware/Auth");
+const cookieParser = require('cookie-parser');
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const db_1 = __importDefault(require("../db/db"));
 const router = express_1.default.Router();
+const SKILL_SCHEMA = zod_1.default.object({
+    name: zod_1.default.string(),
+    proficiency: zod_1.default.string()
+});
 const PROJECT = zod_1.default.object({
     name: zod_1.default.string(),
     roomid: zod_1.default.string().optional(),
     budget: zod_1.default.number().multipleOf(0.1),
     timeline: zod_1.default.number(),
     required_developers: zod_1.default.number(),
+    skills: zod_1.default.array(SKILL_SCHEMA)
 });
 const USER_BODY = zod_1.default.object({
     name: zod_1.default.string(),
@@ -55,13 +61,27 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
                 rating: parsedUser.data.rating,
             },
         });
+        const role = "client";
         const token = jsonwebtoken_1.default.sign({
             userId: user.id,
         }, 
         //@ts-ignore
         process.env.USER_JWT_SECRET);
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+        });
+        res.cookie('role', role, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+        });
         return void res.status(200).json({
             token: token,
+            role: role
         });
     }
     catch (error) {
@@ -97,13 +117,27 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
     }
     if (user.password === parsedSignin.data.password) {
+        const role = "client";
         const token = jsonwebtoken_1.default.sign({
             userId: user.id,
         }, 
         //@ts-ignore
         process.env.USER_JWT_SECRET);
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+        });
+        res.cookie('role', role, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+        });
         return void res.status(200).json({
             token: token,
+            role: role
         });
     }
     return void res.status(400).json({
@@ -112,7 +146,7 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
 }));
 router.post("/addproject", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    debugger;
+    console.log(req.body);
     const parsedProject = PROJECT.safeParse(req.body);
     if (!parsedProject.success) {
         return void res.status(400).json({
@@ -138,11 +172,44 @@ router.post("/addproject", Auth_1.userAuth, (req, res) => __awaiter(void 0, void
                         required_developers: parsedProject.data.required_developers,
                     },
                 });
-                console.log(project);
-                return void res.status(200).json({
-                    message: project,
-                    room: room,
-                });
+                const skills = req.body.skills;
+                const projectId = project.id;
+                try {
+                    if (!Array.isArray(skills)) {
+                        return void res.status(400).json({
+                            message: "The input skills must be an array"
+                        });
+                    }
+                    let valid = true;
+                    skills.forEach((skill) => {
+                        if (!skill.name || !skill.proficiency) {
+                            valid = false;
+                        }
+                    });
+                    if (!valid) {
+                        return void res.status(400).json({
+                            message: "Some Skill is empty"
+                        });
+                    }
+                    const projectskills = yield db_1.default.projectSkill.createMany({
+                        data: skills.map((skill) => ({
+                            project_id: projectId,
+                            name: skill.name,
+                            proficiency: skill.proficiency,
+                        })),
+                    });
+                    return void res.status(200).json({
+                        message: project,
+                        room: room,
+                        skills: projectskills
+                    });
+                }
+                catch (error) {
+                    console.log(error, "ERR");
+                    return void res.status(511).json({
+                        message: "Something went wrong",
+                    });
+                }
             }
             else {
                 return void res.status(400).json({
@@ -203,5 +270,7 @@ router.get("/myprojects", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 
             message: "Couldnt get the projects"
         });
     }
+}));
+router.post("/addskills", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 exports.default = router;

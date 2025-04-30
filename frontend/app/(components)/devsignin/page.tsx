@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { setAuthCookie } from '../../_cookies/cookies'
+import { setAuthCookie } from '../_cookies/cookies'
 import Link from 'next/link';
 import axios from 'axios';
 import { useDispatch , useSelector} from 'react-redux';
 import { login } from '@/public/features/authSlice';
-import { RootState } from '../../../../public/store'
+import { RootState } from '../../../public/store'
 
 export default function DeveloperSignin() {
   const dispatch = useDispatch()
@@ -28,20 +28,26 @@ export default function DeveloperSignin() {
         const response = await axios.post(`http://localhost:3000/api/v1/dev/signin`, {
            email : formData.email,
            password : formData.password
-        });
+        },
+        {
+          withCredentials: true
+        }
+      );
         if(!response.data){
            console.log("NULL")
             alert("OPOPS")
             return;
         }
         const token = response.data.token
+        const role  =  response.data.role
         localStorage.setItem("token", response.data.token);
         setAuthCookie(response.data.token);
         dispatch(login({token: token,
           isAuthenticated:true,
-         username:formData.email
+         username:formData.email,
+         role:role
         }))
-        router.push('/home')
+        router.push('/dev/home')
     }catch(e){
       console.log(e)
       alert("Something went wrong")
@@ -127,5 +133,5 @@ export default function DeveloperSignin() {
         </p>
       </motion.div>
     </div>
-  ) : router.push('/home');
+  ) : router.push('/dev/home');
 }

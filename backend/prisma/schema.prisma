@@ -68,6 +68,7 @@ model Project {
   Assigned_developers Developer[] 
   room                Room?        @relation(fields: [roomid], references: [Roomid])
   createdby           User        @relation(fields: [created_by], references: [id])
+  skills              ProjectSkill[]
 }
 
 model Chat {
@@ -76,5 +77,14 @@ model Chat {
   message_created_by String @unique
   room               Room   @relation(fields: [room_id], references: [Roomid])
   createdby          String
+}
+
+model ProjectSkill{
+  id                 String  @id @default(uuid())
+  project_id         String 
+  name               String
+  proficiency        String 
+  project  Project @relation(fields: [project_id], references: [id])
+
 }
 

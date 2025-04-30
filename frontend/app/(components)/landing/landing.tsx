@@ -9,11 +9,16 @@ import {  useSelector } from 'react-redux';
 import SignupPromptModal from '../signupPromptModal/SignupPromptModal';
 import { RootState } from '../../../public/store'
 export default function Home() {
+  console.log("inside landing")
   const [isModalOpen, setIsModalOpen] = useState(false);
   const token = useSelector((state : RootState) => state.auth.token)
+  //const role = useSelector((state:  RootState)=>state.auth.role)
   const openModal = () => setIsModalOpen(true);
   const router = useRouter();
   const closeModal = () => setIsModalOpen(false);
+  debugger;
+  
+  console.log(token)
 
   return !token ? (
     <div className="bg-gradient-to-br from-teal-400 via-blue-300 to-blue-400 min-h-screen flex flex-col overflow-x-hidden">
@@ -148,5 +153,5 @@ export default function Home() {
         <SignupPromptModal isOpen={isModalOpen} closeModal={closeModal} />
       )}
     </div>
-  ) : router.push('/home') ;
+  ) : router.push(`/home`) ;
 }

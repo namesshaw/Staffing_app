@@ -33,3 +33,5 @@ export interface Skill {
     proficiency : string
     developer_id : string
 }
+
+

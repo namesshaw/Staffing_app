@@ -17,6 +17,7 @@ const zod_1 = __importDefault(require("zod"));
 const db_1 = __importDefault(require("../db/db"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const cookieParser = require('cookie-parser');
 dotenv_1.default.config();
 const Auth_1 = require("../middleware/Auth");
 const router = express_1.default.Router();
@@ -59,8 +60,22 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
         }, 
         //@ts-ignore
         process.env.DEV_JWT_SECRET);
+        const role = "dev";
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+        });
+        res.cookie('role', role, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+        });
         return void res.status(200).json({
             token: token,
+            role: role
         });
     }
     catch (e) {
@@ -93,8 +108,22 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
         }, 
         //@ts-ignore
         process.env.DEV_JWT_SECRET);
+        const role = "dev";
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+        });
+        res.cookie('role', role, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+        });
         return void res.status(200).json({
             token: token,
+            role: role
         });
     }
     return void res.status(400).json({

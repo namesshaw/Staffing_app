@@ -173,7 +173,7 @@ export default function ProfilePage() {
         </section>
         <div className='flex justify-center'>
         <button
-          onClick={() => router.push('/addskills')}
+          onClick={() => router.push('/dev/addskills')}
           className=" px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-md hover:shadow-2xl hover:scale-105 transition font-semibold"
         >
           Add Skills

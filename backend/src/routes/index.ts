@@ -42,4 +42,10 @@ router.get("/verify", async(req, res) => {
     }
     
 })
+router.get("/logout", async(req, res)=>{
+    res.clearCookie('token', { httpOnly: true, secure: false, path: '/' });
+    res.clearCookie('role', { httpOnly: true, secure: false, path: '/' });
+  
+    res.status(200).json({ message: 'Logged out successfully' });
+})
 export default router

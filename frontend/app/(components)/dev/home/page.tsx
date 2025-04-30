@@ -5,7 +5,7 @@ export default function Home(){
     return(
         <div>Hey 
         <button
-        onClick={()=>router.push("/myprofile")}
+        onClick={()=>router.push("/dev/myprofile")}
          className="mr-5 px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-800 text-white shadow-md hover:shadow-2xl hover:scale-105 transition font-semibold"
        >
          Profile

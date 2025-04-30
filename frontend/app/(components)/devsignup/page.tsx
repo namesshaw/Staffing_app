@@ -1,69 +1,76 @@
 'use client';
-
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { setAuthCookie } from '../../_cookies/cookies'
+import { setAuthCookie } from '../_cookies/cookies'
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../../public/store'
 import { login } from '@/public/features/authSlice';
-import {User} from "../../../../../backend/src/interfaces"
-
-export default function UserSignup() {
+import {Developer} from "../../../../backend/src/interfaces"
+import { RootState } from '../../../public/store'
+export default function DeveloperSignup() {
   const dispatch = useDispatch()
-  const router = useRouter();
-  const [formData, setFormData] = useState<Omit<User,"id">>({
+    const router = useRouter();
+    const token = useSelector((state : RootState) => state.auth.token)
+  const [formData, setFormData] = useState<Omit<Developer,"id">>({
     name: '',
+    YOE: 0,
     email: '',
-    company: '',
-    password: '',
     phone: '',
+    password: '',
     rating: 0
   });
-  const token = useSelector((state : RootState) => state.auth.token)
+
   const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log(formData)
     e.preventDefault();
     console.log('Developer Signin:', formData);
     try{
-        const response = await axios.post(`http://localhost:3000/api/v1/client/signup`, {
+        const response = await axios.post(`http://localhost:3000/api/v1/dev/signup`, {
           name: formData.name,
+          YOE: Number(formData.YOE),
           email: formData.email,
-          company: formData.company,
-          password: formData.password,
           phone: formData.phone,
-        });
+          password: formData.password,
+        },
+        {
+          withCredentials: true
+        }
+      );
         if(!response.data){
            console.log("NULL")
-            alert("OPOPS")
+            alert("OOPPS")
             return;
         }
         const token = response.data.token
+        const role  = response.data.role
         localStorage.setItem("token", response.data.token);
         setAuthCookie(response.data.token);
         dispatch(login({token: token,
           isAuthenticated:true,
-         username:formData.email
+         username:formData.email,
+         role: role
         }))
         setSubmitted(true)
-        router.push('/clienthome')
+        router.push('/dev/home')
     }catch(e){
       console.log(e)
       alert("Something went wrong")
     }
   };
 
-  return  !token ? (
+  return !token ?  (
     <div className="relative bg-gradient-to-br from-blue-100 via-white to-cyan-100 h-screen w-screen flex items-center justify-center overflow-hidden px-4">
-      {/* Background Animated Blobs */}
+      {/* Background animated blobs */}
       <motion.div
         className="absolute w-96 h-96 bg-cyan-200/30 rounded-full blur-3xl top-0 left-0 animate-pulse"
         animate={{ scale: [1, 1.1, 1] }}
@@ -86,7 +93,7 @@ export default function UserSignup() {
 
         <div className="relative z-10">
           <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 text-center mb-6">
-            Join Us
+            Developer Signup
           </h1>
 
           <AnimatePresence>
@@ -98,26 +105,28 @@ export default function UserSignup() {
                 exit={{ opacity: 0 }}
                 className="text-center text-green-500 font-semibold mb-6 text-lg"
               >
-                🎉 Successfully Signed Up!
+                🚀 Successfully Registered!
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                {['name', 'email', 'company', 'password', 'phone'].map((field, idx) => (
+                {['name', 'YOE', 'email', 'phone', 'password'].map((field, idx) => (
                   <div key={idx} className="relative">
                     <input
-                      type={field === 'password' ? 'password' : field === 'email' ? 'email' : field === 'phone' ? 'tel' : 'text'}
+                      type={field === 'password' ? 'password' : field === 'email' ? 'email' : field === 'phone' ? 'tel' : field === 'YOE' ? 'number' : 'text'}
                       name={field}
                       placeholder=" "
                       value={formData[field as keyof typeof formData]}
                       onChange={handleChange}
-                      required={['name', 'email', 'password'].includes(field)}
+                      required={['name', 'email', 'phone', 'password'].includes(field)}
                       className="peer px-4 py-3 rounded-xl w-full border border-blue-200 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-300 outline-none bg-white text-sm shadow-sm placeholder-transparent"
+                      step={field === 'YOE' ? "0.1" : undefined}
+                      min={field === 'YOE' ? "0" : undefined}
                     />
                     <label
                       className="absolute left-4 top-3 text-blue-400 text-sm transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-blue-300 peer-focus:top-0 peer-focus:text-xs peer-focus:text-cyan-400"
                       htmlFor={field}
                     >
-                      {field.charAt(0).toUpperCase() + field.slice(1)}
+                      {field === 'YOE' ? 'Years of Experience' : field.charAt(0).toUpperCase() + field.slice(1)}
                     </label>
                   </div>
                 ))}
@@ -128,7 +137,7 @@ export default function UserSignup() {
                   type="submit"
                   className="w-full py-3 mt-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ease-in-out text-sm"
                 >
-                  Sign Up
+                  Register
                 </motion.button>
               </form>
             )}
@@ -136,12 +145,12 @@ export default function UserSignup() {
 
           <p className="text-center text-blue-400 mt-5 text-xs">
             Already have an account?{' '}
-            <Link href="/usersignin" className="text-cyan-500 font-semibold hover:underline">
+            <Link href="/devsignin" className="text-cyan-500 font-semibold hover:underline">
               Log In
             </Link>
           </p>
         </div>
       </motion.div>
     </div>
-  ) : router.push('/clienthome');
+  ) : router.push('/dev/home')
 }

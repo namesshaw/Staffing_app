@@ -148,7 +148,7 @@ router.post("/signin", async (req: Request, res: Response) => {
 router.post("/addproject",userAuth ,async (req: UserRequest, res: Response) => {
   
   console.log(req.body)
-  debugger
+
     const parsedProject = PROJECT.safeParse(req.body);
     if (!parsedProject.success) {
       return void res.status(400).json({

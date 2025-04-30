@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-
+debugger
   const token = request.cookies.get('token')?.value;
   const role = request.cookies.get('role')?.value;
   console.log(token);
@@ -15,7 +15,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
 
-  if (pathname.startsWith('/dev') && role === 'user') {
+  if (pathname.startsWith('/dev') && role === 'client') {
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
   return NextResponse.next();

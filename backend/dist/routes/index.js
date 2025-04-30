@@ -52,4 +52,9 @@ router.get("/verify", (req, res) => __awaiter(void 0, void 0, void 0, function* 
         }
     }
 }));
+router.get("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.clearCookie('token', { httpOnly: true, secure: false, path: '/' });
+    res.clearCookie('role', { httpOnly: true, secure: false, path: '/' });
+    res.status(200).json({ message: 'Logged out successfully' });
+}));
 exports.default = router;

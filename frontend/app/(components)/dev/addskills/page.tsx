@@ -66,7 +66,7 @@ export default function AddSkills() {
             await axios.put('http://localhost:3000/api/v1/dev/addskills', 
                 { skills },
             )
-            router.push('/addskills') // Or wherever you want to redirect after success
+            router.push('dev/addskills') // Or wherever you want to redirect after success
         } catch (error) {
             console.error('Error adding skills:', error)
         }

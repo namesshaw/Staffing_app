@@ -10,10 +10,10 @@ const verifyAuth = async () => {
     if (!token) {
       return null;
     }
-
     // Server-side fetch call
     const response = await fetch("http:localhost:3000/api/v1/verify", {
       headers: {
+        
         Authorization: token,
         'Content-Type': 'application/json',
       },
@@ -35,17 +35,20 @@ const verifyAuth = async () => {
 export default async function Home() {
   const auth = await verifyAuth();
 
-  if (auth?.user) {
+  if (auth?.message === "USER Verified") {
+    
+    console.log("inside user")
     redirect('/client/home');
   }
   
-  if (auth?.developer) {
-    redirect('/developer/home');
+  if (auth?.message === "DEV Verified") {
+    console.log("inside developer")
+    redirect('/dev/home');
   }
 
   return (
     <main>
-      <LandingPage />
+      <LandingPage/>
     </main>
   );
 }

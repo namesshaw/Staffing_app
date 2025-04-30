@@ -1,8 +1,13 @@
 'use client'
-// import { Project } from "../../../../../backend/src/interfaces"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import axios from "axios"
+
+// Update the Skill interface
+interface Skill {
+    name: string;
+    proficiency: "Beginner" | "Intermediate" | "Advanced" | "Expert";
+}
 
 export default function AddProject() {
     const router = useRouter()
@@ -10,10 +15,36 @@ export default function AddProject() {
         name: "",
         budget: 0,
         timeline: 0,
-        required_developers: 0
+        required_developers: 0,
+        skills: [] as Skill[]  // Add skills array
+    })
+    // Update initial state with string proficiency
+    const [currentSkill, setCurrentSkill] = useState<Skill>({
+        name: "",
+        proficiency: "Beginner"
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
+
+    // Add skill handler
+    const handleAddSkill = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (currentSkill.name) {
+            setProjectData({
+                ...projectData,
+                skills: [...projectData.skills, currentSkill]
+            });
+            setCurrentSkill({ name: "", proficiency: "Beginner" }); // Reset current skill
+        }
+    };
+
+    // Remove skill handler
+    const handleRemoveSkill = (index: number) => {
+        setProjectData({
+            ...projectData,
+            skills: projectData.skills.filter((_, i) => i !== index)
+        });
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -27,7 +58,7 @@ export default function AddProject() {
                 projectData,
             )
             if (response.status === 200) {
-                router.push('/clienthome')
+                router.push('/client/home')
             }
         } catch (err) {
             setError("Failed to create project. Please try again.")
@@ -109,6 +140,76 @@ export default function AddProject() {
                             value={projectData.required_developers}
                             onChange={(e) => setProjectData({ ...projectData, required_developers: parseInt(e.target.value) })}
                         />
+                    </div>
+
+                    {/* Add Skills Section */}
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-medium text-gray-900">Required Skills</h3>
+                        
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <input
+                                    type="text"
+                                    placeholder="Skill name"
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    value={currentSkill.name}
+                                    onChange={(e) => setCurrentSkill({
+                                        ...currentSkill,
+                                        name: e.target.value
+                                    })}
+                                />
+                            </div>
+                            <div className="w-32">
+                                <select
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    value={currentSkill.proficiency}
+                                    onChange={(e) => setCurrentSkill({
+                                        ...currentSkill,
+                                        proficiency: e.target.value as Skill["proficiency"]
+                                    })}
+                                >
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                    <option value="Expert">Expert</option>
+                                </select>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleAddSkill}
+                                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            >
+                                Add
+                            </button>
+                        </div>
+
+                        {/* Skills List */}
+                        <div className="mt-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {projectData.skills.map((skill, index) => (
+                                    <div 
+                                        key={index} 
+                                        className="flex items-center justify-between bg-gray-50 p-2 rounded-md"
+                                    >
+                                        <div className="flex-1 min-w-0">
+                                            <span className="font-medium truncate block">{skill.name}</span>
+                                            <span className="text-sm text-gray-500">
+                                                {skill.proficiency}
+                                            </span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveSkill(index)}
+                                            className="ml-2 text-red-500 hover:text-red-700 flex-shrink-0"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
                     <button

@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import zod from "zod";
 import { userAuth } from "../middleware/Auth";
 import { User } from "../interfaces";
+const cookieParser = require('cookie-parser');
 import dotenv from "dotenv";
 dotenv.config();
 interface UserRequest extends Request {
@@ -11,13 +12,19 @@ interface UserRequest extends Request {
 }
 
 import prismaClient from "../db/db";
+import { isArrayLiteralExpression } from "typescript";
 const router = express.Router();
+const SKILL_SCHEMA = zod.object({
+  name: zod.string(),
+  proficiency: zod.string()
+})
 const PROJECT = zod.object({
   name: zod.string(),
   roomid: zod.string().optional(),
   budget: zod.number().multipleOf(0.1),
   timeline: zod.number(),
   required_developers: zod.number(),
+  skills : zod.array(SKILL_SCHEMA)
 });
 const USER_BODY = zod.object({
   name: zod.string(),
@@ -49,7 +56,7 @@ router.post("/signup", async (req: Request, res: Response) => {
         rating: parsedUser.data.rating,
       },
     });
-
+const role = "client"
     const token = jwt.sign(
       {
         userId: user.id,
@@ -57,8 +64,21 @@ router.post("/signup", async (req: Request, res: Response) => {
       //@ts-ignore
       process.env.USER_JWT_SECRET
     );
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+    });
+    res.cookie('role', role, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+    });
     return void res.status(200).json({
       token: token,
+      role: role
     });
   } catch (error) {
     return void res.status(500).json({ error: "Internal Server Error" });
@@ -93,6 +113,9 @@ router.post("/signin", async (req: Request, res: Response) => {
     });
   }
   if (user.password === parsedSignin.data.password) {
+    const role = "client"
+
+        
     const token = jwt.sign(
       {
         userId: user.id,
@@ -100,15 +123,31 @@ router.post("/signin", async (req: Request, res: Response) => {
       //@ts-ignore
       process.env.USER_JWT_SECRET
     );
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+    });
+    res.cookie('role', role, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+    });
     return void res.status(200).json({
       token: token,
+      role: role
     });
   }
+  
   return void res.status(400).json({
     error: "Please check your email or password",
   });
 });
 router.post("/addproject",userAuth ,async (req: UserRequest, res: Response) => {
+  
+  console.log(req.body)
   debugger
     const parsedProject = PROJECT.safeParse(req.body);
     if (!parsedProject.success) {
@@ -135,11 +174,48 @@ router.post("/addproject",userAuth ,async (req: UserRequest, res: Response) => {
               required_developers: parsedProject.data.required_developers,
             },
           });
-          console.log(project);
-          return void res.status(200).json({
-            message: project,
-            room: room,
-          });
+
+          const skills = req.body.skills as {
+            name:        string;
+            proficiency: string;
+          }[]
+        
+          const projectId =  project.id
+             try {
+              if(!Array.isArray(skills)){
+                return void res.status(400).json({
+                  message: "The input skills must be an array"
+                })
+              }
+              let valid  = true
+              skills.forEach((skill)=>{
+                if (!skill.name || !skill.proficiency) {
+                  valid = false
+              }
+              })
+              if(!valid){
+                 return void res.status(400).json({
+                  message: "Some Skill is empty"
+                 })
+              }
+              const projectskills = await prismaClient.projectSkill.createMany({
+                data: skills.map((skill) => ({
+                  project_id: projectId,
+                  name: skill.name,
+                  proficiency: skill.proficiency,
+              })),
+              })
+              return void res.status(200).json({
+                message: project,
+                room: room,
+                skills: projectskills
+              });
+            } catch (error) {
+              console.log(error, "ERR");
+              return void res.status(511).json({
+                  message: "Something went wrong",
+              });
+             }          
         } else {
           return void res.status(400).json({
             message: "Room not created hence project not created",
@@ -199,4 +275,7 @@ router.get("/myprojects", userAuth, async (req, res) => {
   }
 
 });
+router.post("/addskills", async(req, res)=>{
+  
+})
 export default router;

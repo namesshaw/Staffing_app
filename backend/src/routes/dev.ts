@@ -3,6 +3,7 @@ import zod, { ParseStatus } from "zod";
 import prismaClient from "../db/db";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+const cookieParser = require('cookie-parser');
 dotenv.config();
 import { devAuth } from "../middleware/Auth";
 import { Skill, Developer } from "../interfaces";
@@ -52,8 +53,23 @@ router.post("/signup", async (req, res) => {
             //@ts-ignore
             process.env.DEV_JWT_SECRET
         );
+        const role = "dev"
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+          });
+          res.cookie('role', role, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+          });
         return void res.status(200).json({
             token: token,
+            role: role
         });
     }catch(e){
         console.log(e);
@@ -88,8 +104,24 @@ router.post("/signin", async (req, res) => {
             //@ts-ignore
             process.env.DEV_JWT_SECRET
         );
+        const role = "dev"
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+          });
+          res.cookie('role', role, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/',
+          });
+
         return void res.status(200).json({
             token: token,
+            role: role
         });
     }
     return void res.status(400).json({

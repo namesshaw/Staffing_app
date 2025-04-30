@@ -130,6 +130,7 @@ router.post("/signin", async (req, res) => {
 });
 
 router.put("/addskills", devAuth, async (req: DeveloperRequest, res: Response) => {
+    debugger
     const skills: Skill[] = req.body.skills as {
         name: string;
         proficiency: string;

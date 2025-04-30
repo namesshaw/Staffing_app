@@ -34,6 +34,7 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
       
     })
     router.push("/")
+    dispatch(logout())
   }
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);

@@ -48,50 +48,41 @@ export default function AddSkills() {
         }
     }
 
-    // const editSkill = (index: number) => {
-    //     const skillToEdit = skills[index]
-    //     setCurrentSkill(skillToEdit.name)
-    //     setCurrentProficiency(skillToEdit.proficiency)
-    //     setEditingIndex(index)
-    // }
-
     const removeSkill = (indexToRemove: number) => {
         setSkills(skills.filter((_, index) => index !== indexToRemove))
     }
 
     const handleSubmit = async () => {
-        console.log("Inside handlesubmit")
         try {
-            debugger
             await axios.put('http://localhost:3000/api/v1/dev/addskills', 
                 { skills },
             )
-            router.push('dev/addskills') // Or wherever you want to redirect after success
+            router.push('/dev/addskills') // Or wherever you want to redirect after success
         } catch (error) {
             console.error('Error adding skills:', error)
         }
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 p-8">
-            <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow">
-                <h1 className="text-2xl font-bold mb-6">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-8">
+            <div className="max-w-2xl mx-auto bg-gray-800 p-6 rounded-2xl shadow-xl">
+                <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-400 text-transparent bg-clip-text mb-6 text-center">
                     {editingIndex !== null ? 'Edit Skill' : 'Add Your Skills'}
                 </h1>
-                
-                <div className="mb-4">
+
+                <div className="mb-6">
                     <input
                         type="text"
                         value={currentSkill}
                         onChange={(e) => setCurrentSkill(e.target.value)}
                         onKeyPress={handleKeyPress}
                         placeholder={editingIndex !== null ? "Edit skill and press Enter" : "Type a skill and press Enter"}
-                        className="w-full p-2 border rounded"
+                        className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600"
                     />
                     <select
                         value={currentProficiency}
                         onChange={(e) => setCurrentProficiency(e.target.value)}
-                        className="mt-2 p-2 border rounded"
+                        className="mt-2 p-3 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                     >
                         <option value="Beginner">Beginner</option>
                         <option value="Intermediate">Intermediate</option>
@@ -105,17 +96,11 @@ export default function AddSkills() {
                         <div 
                             key={index}
                             className={`px-3 py-1 rounded-full flex items-center ${
-                                editingIndex === index ? 'bg-yellow-100' : 'bg-blue-100'
+                                editingIndex === index ? 'bg-yellow-200' : 'bg-blue-600'
                             }`}
                         >
                             <span>{skill.name} - {skill.proficiency}</span>
                             <div className="ml-2 flex gap-1">
-                                {/* <button
-                                    onClick={() => editSkill(index)}
-                                    className="text-blue-500 hover:text-blue-700"
-                                >
-                                    ✎
-                                </button> */}
                                 <button
                                     onClick={() => removeSkill(index)}
                                     className="text-red-500 hover:text-red-700"
@@ -129,7 +114,7 @@ export default function AddSkills() {
 
                 <button
                     onClick={handleSubmit}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    className="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg hover:scale-105 transition"
                 >
                     Save All Skills
                 </button>

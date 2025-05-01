@@ -1,29 +1,42 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { setAuthCookie } from '../_cookies/cookies'
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../public/store'
+import { RootState } from '../../../public/store';
 import { login } from '@/public/features/authSlice';
-import {User} from "../../../../backend/src/interfaces"
+import { setAuthCookie } from '../_cookies/cookies';
+
+interface User {
+  name: string;
+  email: string;
+  company?: string;
+  password: string;
+  phone?: string;
+}
 
 export default function UserSignup() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const router = useRouter();
-  const [formData, setFormData] = useState<Omit<User,"id">>({
+  const token = useSelector((state: RootState) => state.auth.token);
+  const [formData, setFormData] = useState<User>({
     name: '',
     email: '',
     company: '',
     password: '',
     phone: '',
-    rating: 0
   });
-  const token = useSelector((state : RootState) => state.auth.token)
+  const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (token) {
+      router.push('/client/home');
+    }
+  }, [token]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -32,123 +45,128 @@ export default function UserSignup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Developer Signin:', formData);
-    try{
-        const response = await axios.post(`http://localhost:3000/api/v1/client/signup`, {
-          name: formData.name,
-          email: formData.email,
-          company: formData.company,
-          password: formData.password,
-          phone: formData.phone,
-        },
+    setError('');
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/user/signup`,
         {
-          withCredentials: true
-        });
-        if(!response.data){
-           console.log("NULL")
-            alert("OPOPS")
-            return;
-        }
-        const role = response.data.role
-        const token = response.data.token
-        localStorage.setItem("token", response.data.token);
-        setAuthCookie(response.data.token);
-        dispatch(login({token: token,
-          isAuthenticated:true,
-          email : formData.email,
-         username:formData.name,
-         role:role,
-         userId : response.data.userId
-        }))
-        setSubmitted(true)
-        router.push('client/home')
-    }catch(e){
-      console.log(e)
-      alert("Something went wrong")
+          ...formData,
+        },
+        { withCredentials: true }
+      );
+
+      const { token, role, userId } = response.data;
+
+      localStorage.setItem('token', token);
+      setAuthCookie(token);
+      dispatch(
+        login({
+          token,
+          isAuthenticated: true,
+          email: formData.email,
+          username: formData.name,
+          role,
+          userId,
+        })
+      );
+
+      setSubmitted(true);
+      setTimeout(() => {
+        router.push('/client/home');
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      setError('Signup failed. Please try again.');
     }
   };
 
-  return  !token ? (
-    <div className="relative bg-gradient-to-br from-blue-100 via-white to-cyan-100 h-screen w-screen flex items-center justify-center overflow-hidden px-4">
-      {/* Background Animated Blobs */}
+  return (
+    <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 h-screen w-screen flex items-center justify-center overflow-hidden px-4">
+      {/* Background Blobs */}
       <motion.div
-        className="absolute w-96 h-96 bg-cyan-200/30 rounded-full blur-3xl top-0 left-0 animate-pulse"
+        className="absolute w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl top-0 left-0 animate-pulse"
         animate={{ scale: [1, 1.1, 1] }}
         transition={{ repeat: Infinity, duration: 8 }}
       />
       <motion.div
-        className="absolute w-80 h-80 bg-blue-200/30 rounded-full blur-3xl bottom-0 right-0 animate-pulse"
+        className="absolute w-80 h-80 bg-blue-500/20 rounded-full blur-3xl bottom-0 right-0 animate-pulse"
         animate={{ scale: [1, 1.05, 1] }}
         transition={{ repeat: Infinity, duration: 7 }}
       />
 
+      {/* Signup Card */}
       <motion.div
-        className="relative z-10 bg-white/80 backdrop-blur-md p-8 md:p-10 rounded-3xl shadow-xl w-full max-w-md md:max-w-sm overflow-hidden"
+        className="relative z-10 bg-white/5 backdrop-blur-md p-8 md:p-10 rounded-3xl shadow-xl w-full max-w-md border border-gray-700"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
       >
-        {/* Subtle Gradient Border */}
-        <div className="absolute inset-0 rounded-3xl p-1 bg-gradient-to-r from-cyan-300 via-blue-300 to-cyan-300 blur-lg opacity-10 animate-pulse z-0"></div>
+        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 text-center mb-6">
+          User Signup
+        </h1>
 
-        <div className="relative z-10">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 text-center mb-6">
-            Join Us
-          </h1>
-
-          <AnimatePresence>
-            {submitted ? (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-center text-green-500 font-semibold mb-6 text-lg"
-              >
-                🎉 Successfully Signed Up!
-              </motion.div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                {['name', 'email', 'company', 'password', 'phone'].map((field, idx) => (
-                  <div key={idx} className="relative">
-                    <input
-                      type={field === 'password' ? 'password' : field === 'email' ? 'email' : field === 'phone' ? 'tel' : 'text'}
-                      name={field}
-                      placeholder=" "
-                      value={formData[field as keyof typeof formData]}
-                      onChange={handleChange}
-                      required={['name', 'email', 'password'].includes(field)}
-                      className="peer px-4 py-3 rounded-xl w-full border border-blue-200 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-300 outline-none bg-white text-sm shadow-sm placeholder-transparent"
-                    />
-                    <label
-                      className="absolute left-4 top-3 text-blue-400 text-sm transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-blue-300 peer-focus:top-0 peer-focus:text-xs peer-focus:text-cyan-400"
-                      htmlFor={field}
-                    >
-                      {field.charAt(0).toUpperCase() + field.slice(1)}
-                    </label>
-                  </div>
-                ))}
-
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  type="submit"
-                  className="w-full py-3 mt-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ease-in-out text-sm"
+        {submitted ? (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center text-green-500 font-semibold mb-6 text-lg"
+          >
+            🎉 Successfully Signed Up!
+          </motion.div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            {/* Input Fields */}
+            {['name', 'email', 'company', 'phone', 'password'].map((field) => (
+              <div key={field} className="relative">
+                <input
+                  type={
+                    field === 'password'
+                      ? 'password'
+                      : field === 'email'
+                      ? 'email'
+                      : field === 'phone'
+                      ? 'tel'
+                      : 'text'
+                  }
+                  name={field}
+                  placeholder=" "
+                  value={formData[field as keyof typeof formData] || ''}
+                  onChange={handleChange}
+                  required={['name', 'email', 'password'].includes(field)}
+                  className="peer px-4 py-3 w-full rounded-xl border border-gray-700 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 outline-none bg-transparent text-sm text-white placeholder-transparent"
+                />
+                <label
+                  className="absolute left-4 top-3 text-cyan-400 text-sm transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-xs peer-focus:text-cyan-300"
                 >
-                  Sign Up
-                </motion.button>
-              </form>
-            )}
-          </AnimatePresence>
+                  {field.charAt(0).toUpperCase() + field.slice(1)}
+                </label>
+              </div>
+            ))}
 
-          <p className="text-center text-blue-400 mt-5 text-xs">
-            Already have an account?{' '}
-            <Link href="/usersignin" className="text-cyan-500 font-semibold hover:underline">
-              Log In
-            </Link>
-          </p>
-        </div>
+            {/* Error Message */}
+            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+
+            {/* Submit Button */}
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              type="submit"
+              className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-sm"
+            >
+              Sign Up
+            </motion.button>
+          </form>
+        )}
+
+        <p className="text-center text-gray-400 mt-5 text-xs">
+          Already have an account?{' '}
+          <Link href="/usersignin" className="text-cyan-400 font-semibold hover:underline">
+            Log In
+          </Link>
+        </p>
       </motion.div>
     </div>
-  ) : router.push('client/home');
+  );
 }

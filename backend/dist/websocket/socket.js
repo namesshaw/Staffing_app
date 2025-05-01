@@ -34,6 +34,7 @@ function InitWebsocket() {
             }
             if (parsedMessage.type === "chat") {
                 // console.log("")
+                console.log("user with " + userId + " messaged");
                 const currRoom = allSockets[userId].room;
                 const chats = yield db_1.default.chat.create({
                     data: {
@@ -52,6 +53,7 @@ function InitWebsocket() {
         }));
         soc.on("close", () => {
             var _a;
+            console.log("Websocket closed now");
             const userId = (_a = Object.entries(allSockets)
                 .find(([_, user]) => user.socket === soc)) === null || _a === void 0 ? void 0 : _a[0];
             if (userId)

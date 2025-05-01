@@ -2,162 +2,166 @@
 import axios from "axios";
 import { useState, useEffect, useRef, FormEvent } from "react";
 import { useParams } from "next/navigation";
-import type { RootState } from '../../../../../public/store'
-import { useSelector } from 'react-redux'
+import type { RootState } from '../../../../../public/store';
+import { useSelector } from 'react-redux';
 
 interface Chat {
-    id?: string;
-    name_of_creator: string;
-    message: string;
-    room_id: string;
-    createdAt?: Date;
+  id?: string;
+  name_of_creator: string;
+  message: string;
+  room_id: string;
+  createdAt?: string | Date;
+  creation_time?: string | Date;
 }
 
+
 export default function Chat() {
-    const username = useSelector((state: RootState) => state.auth.username);
-    const userId = useSelector((state: RootState) => state.auth.userId);
-    const roomId = useParams().id as string;
-    const wsRef = useRef<WebSocket | null>(null);
-    const [chats, setChats] = useState<Chat[]>([]);
-    const [message, setMessage] = useState('');
-    const chatContainerRef = useRef<HTMLDivElement>(null);
+  const username = useSelector((state: RootState) => state.auth.username);
+  const userId = useSelector((state: RootState) => state.auth.userId);
+  const roomId = useParams().id as string;
+  const wsRef = useRef<WebSocket | null>(null);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [message, setMessage] = useState('');
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
-    // Fetch existing chats
-    useEffect(() => {
-        const getChats = async () => {
-            try {
-                const response = await axios.get(`http://localhost:3000/api/v1/chatroom/${roomId}`);
-                setChats(response.data);
-            } catch (error) {
-                console.error('Failed to fetch chats:', error);
-            }
-        };
-        getChats();
-    }, [roomId]);
+  useEffect(() => {
+    const getChats = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/api/v1/chatroom/${roomId}`);
+        setChats(response.data);
+      } catch (error) {
+        console.error('Failed to fetch chats:', error);
+      }
+    };
+    getChats();
+  }, [roomId]);
 
-    // WebSocket connection
-    useEffect(() => {
-        const ws = new WebSocket("ws://localhost:8080");
+  useEffect(() => {
+    if (!username || !userId || !roomId) return;
+    const ws = new WebSocket("ws://localhost:8080");
+    wsRef.current = ws;
 
-        ws.onopen = () => {
-            console.log('Connected to chat server');
-            ws.send(JSON.stringify({
-                type: "join",
-                username: username,
-                userId: userId,
-                payload: {
-                    roomId: roomId
-                }
-            }));
-        };
-
-        
-
-        ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
-
-        wsRef.current = ws;
-
-        
-    }, [roomId, userId, username]);
-
-    // Auto-scroll to bottom when new messages arrive
-    useEffect(() => {
-        if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    ws.onopen = () => {
+      console.log('Connected to chat server');
+      ws.send(JSON.stringify({
+        type: "join",
+        username,
+        userId,
+        payload: {
+          roomId
         }
-    }, [chats]);
-
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        if (!message.trim() || !wsRef.current) return;
-
-        wsRef.current.send(JSON.stringify({
-            type: "chat",
-            userId: userId,
-            username: username,
-            payload: {
-                message: message,
-            }
-        }));
-        wsRef.current.onmessage = (event) => {
-            try {
-                console.log(event.data)
-                const newChat = JSON.parse(event.data);
-                setChats(prevChats => [...prevChats, newChat]);
-            } catch (error) {
-                console.error('Failed to parse message:', event.data, error);
-                // If the message is plain text, create a chat object
-                if (typeof event.data === 'string') {
-                    const textChat: Chat = {
-                        name_of_creator: 'System',
-                        message: event.data,
-                        room_id: roomId,
-                        createdAt: new Date()
-                    };
-                    setChats(prevChats => [...prevChats, textChat]);
-                }
-            }
-        };
-        setMessage('');
-        return () => {
-            wsRef.current?.close();
-        };
-        
+      }));
     };
 
-    return (
-        <div className="flex flex-col h-screen max-h-screen">
-            <div className="bg-gray-800 p-4 text-white">
-                <h1 className="text-xl">Chat Room: {roomId}</h1>
-                <p className="text-sm">Logged in as: {username}</p>
-            </div>
+    ws.onmessage = (event) => {
+      try {
+        const newChat = JSON.parse(event.data);
+        setChats((prevChats) => [...prevChats, newChat]);
+      } catch (error) {
+        console.error("Invalid message format:", event.data);
+      }
+    };
 
-            <div 
-                ref={chatContainerRef}
-                className="flex-1 overflow-y-auto p-4 space-y-4"
-            >
-                {chats.map((chat, index) => (
-                    <div 
-                        key={chat.id || index}
-                        className={`flex ${chat.name_of_creator === username ? 'justify-end' : 'justify-start'}`}
-                    >
-                        <div className={`max-w-[70%] rounded-lg p-3 ${
-                            chat.name_of_creator === username 
-                                ? 'bg-blue-500 text-white' 
-                                : 'bg-gray-200 text-gray-800'
-                        }`}>
-                            <p className="text-sm font-semibold">{chat.name_of_creator}</p>
-                            <p>{chat.message}</p>
-                            <p className="text-xs opacity-70">
-                                {new Date(chat.createdAt || '').toLocaleTimeString()}
-                            </p>
-                        </div>
-                    </div>
-                ))}
-            </div>
+    // ws.onerror = () => {
+    //   console.error("WebSocket encountered an error (event not detailed).");
+    // };
 
-            <form 
-                onSubmit={handleSubmit}
-                className="border-t p-4 bg-white"
-            >
-                <div className="flex gap-2">
-                    <input
-                        type="text"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Type a message..."
-                        className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                        type="submit"
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    >
-                        Send
-                    </button>
-                </div>
-            </form>
+    ws.onclose = () => {
+      console.warn("WebSocket connection closed");
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [roomId, userId, username]);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chats]);
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!message.trim() || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+
+    const chatData = {
+      type: "chat",
+      userId,
+      username,
+      payload: { message },
+    };
+
+    wsRef.current.send(JSON.stringify(chatData));
+
+    setChats(prev => [
+      ...prev,
+      {
+        name_of_creator: username || "Unknown User",
+        message,
+        room_id: roomId,
+        createdAt: new Date(),
+      }
+    ]);
+    setMessage('');
+  };
+
+  return (
+    <div className="flex flex-col bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden min-h-0 flex-grow">
+      {/* Header */}
+      <div className="bg-gray-800 px-6 py-4 shadow-md border-b border-gray-700 shrink-0">
+        <h1 className="text-2xl font-bold text-blue-500">Chat Room: {roomId}</h1>
+        <p className="text-sm text-gray-400">Logged in as: {username}</p>
+      </div>
+  
+      {/* Chat messages */}
+      <div
+        ref={chatContainerRef}
+        className="overflow-y-auto px-4 py-4 space-y-4 flex-grow"
+      >
+        {chats.map((chat, index) => (
+          <div
+            key={chat.id || index}
+            className={`flex ${chat.name_of_creator === username ? 'justify-end' : 'justify-start'}`}
+          >
+            <div className={`w-fit max-w-lg p-3 rounded-xl shadow-md transition-transform ${
+              chat.name_of_creator === username
+                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                : 'bg-gray-700 text-white'
+            }`}>
+              <div className="text-xs font-medium mb-1 text-gray-300">{chat.name_of_creator}</div>
+              <p className="text-base break-words">{chat.message}</p>
+              <p className="text-[10px] text-right text-gray-400 mt-1">
+              {new Date(chat.createdAt || chat.creation_time || '').toLocaleTimeString()}
+
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+  
+      {/* Input box */}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-gray-900 border-t border-gray-700 px-4 py-3 shrink-0"
+      >
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Type a message..."
+            className="flex-1 px-4 py-2 rounded-full bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            className="px-5 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-semibold hover:scale-105 transition-all duration-300"
+          >
+            Send
+          </button>
         </div>
-    );
+      </form>
+    </div>
+  );
+  
 }

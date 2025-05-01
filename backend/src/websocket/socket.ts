@@ -44,6 +44,7 @@ export function InitWebsocket(){
     
             if(parsedMessage.type === "chat"){
                 // console.log("")
+                console.log("user with " + userId + " messaged" )
                 const currRoom = allSockets[userId].room;
                 const chats = await prismaClient.chat.create({
                     data : {
@@ -61,6 +62,7 @@ export function InitWebsocket(){
             }
         })
         soc.on("close", () => {
+          console.log("Websocket closed now")
             const userId = Object.entries(allSockets)
                 .find(([_, user]) => user.socket === soc)?.[0];
             if (userId) delete allSockets[userId];

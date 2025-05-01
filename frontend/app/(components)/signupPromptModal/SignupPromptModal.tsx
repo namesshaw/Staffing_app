@@ -23,7 +23,7 @@ export default function SignupPromptModal({ isOpen, closeModal }: SignupPromptMo
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto flex items-center justify-center">
@@ -37,7 +37,7 @@ export default function SignupPromptModal({ isOpen, closeModal }: SignupPromptMo
               leaveFrom="scale-100 opacity-100"
               leaveTo="scale-75 opacity-0"
             >
-              <Dialog.Panel className="bg-white rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center space-y-6">
+              <Dialog.Panel className="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center space-y-6">
                 <motion.h2
                   className="text-3xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-400 text-transparent bg-clip-text"
                   initial={{ opacity: 0 }}
@@ -55,21 +55,21 @@ export default function SignupPromptModal({ isOpen, closeModal }: SignupPromptMo
                 >
                   <Link
                     href="/devsignup"
-                    className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold rounded-full hover:scale-105 hover:shadow-lg transition"
+                    className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-full hover:scale-105 hover:shadow-lg transition"
                   >
                     I am a Developer
                   </Link>
                   <Link
                     href="/usersignup"
-                    className="w-full py-3 border-2 border-blue-400 text-blue-600 font-semibold rounded-full hover:scale-105 hover:bg-blue-50 transition"
+                    className="w-full py-3 border-2 border-blue-400 text-blue-400 font-semibold rounded-full hover:scale-105 hover:bg-gray-700 transition"
                   >
-                    I am a User
+                    I am a Client
                   </Link>
                 </motion.div>
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="text-blue-400 text-sm hover:text-blue-600"
+                  className="text-sm text-blue-400 hover:text-blue-500 transition"
                 >
                   Cancel
                 </button>

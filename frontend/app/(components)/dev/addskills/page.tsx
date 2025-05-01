@@ -14,7 +14,7 @@ export default function AddSkills() {
 
     useEffect(() => {
         getSkills()
-    }, []) // Remove skills dependency to prevent infinite loop
+    }, [skills]) // Remove skills dependency to prevent infinite loop
 
     const getSkills = async() => {
         try {

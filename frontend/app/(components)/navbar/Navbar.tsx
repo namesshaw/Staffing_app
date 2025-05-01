@@ -96,7 +96,7 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
       {isOpen && (
         <div className="absolute top-20 left-0 w-full flex flex-col items-center bg-gradient-to-br from-gray-900 to-gray-800/90 backdrop-blur-md py-6 gap-6 shadow-lg md:hidden z-50">
           {['Features', 'About', 'Contact'].map((item, idx) => (
-            <Link
+            <Link 
               key={idx}
               href={`#${item.toLowerCase()}`}
               onClick={() => setIsOpen(false)}
@@ -105,24 +105,27 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
               {item}
             </Link>
           ))}
-          <button
-            onClick={() => {
-              openModal();
-              setIsOpen(false);
-            }}
-            className="text-cyan-400 hover:text-cyan-300 font-bold text-lg"
-          >
-            Sign In
-          </button>
-          <button
-            onClick={() => {
-              onSignupClick();
-              setIsOpen(false);
-            }}
-            className="px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-md hover:scale-105 transition font-semibold"
-          >
-            Sign Up
-          </button>
+          {!islogin && 
+          (<div>
+            <button
+              onClick={() => {
+                openModal();
+                setIsOpen(false);
+              }}
+              className="text-cyan-400 hover:text-cyan-300 font-bold text-lg"
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => {
+                onSignupClick();
+                setIsOpen(false);
+              }}
+              className="px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-md hover:scale-105 transition font-semibold"
+            >
+              Sign Up
+            </button>
+          </div>)}
         </div>
       )}
 

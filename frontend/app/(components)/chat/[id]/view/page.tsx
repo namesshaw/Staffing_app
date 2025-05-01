@@ -58,7 +58,7 @@ export default function Chat() {
         const newChat = JSON.parse(event.data);
         setChats((prevChats) => [...prevChats, newChat]);
       } catch (error) {
-        console.error("Invalid message format:", event.data);
+        console.error("Invalid message format:", event.data, error);
       }
     };
 
@@ -117,7 +117,7 @@ export default function Chat() {
       {/* Chat messages */}
       <div
         ref={chatContainerRef}
-        className="overflow-y-auto px-4 py-4 space-y-4 flex-grow"
+        className=" overflow-y-auto px-40 py-4 space-y-4 flex-grow"
       >
         {chats.map((chat, index) => (
           <div
@@ -141,9 +141,10 @@ export default function Chat() {
       </div>
   
       {/* Input box */}
+      
       <form
         onSubmit={handleSubmit}
-        className="bg-gray-900 border-t border-gray-700 px-4 py-3 shrink-0"
+        className="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-700 px-4 py-3"
       >
         <div className="flex gap-2">
           <input
@@ -161,6 +162,7 @@ export default function Chat() {
           </button>
         </div>
       </form>
+      
     </div>
   );
   

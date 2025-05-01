@@ -130,6 +130,33 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
         error: "Inputs are incorrect please check your username and password",
     });
 }));
+router.get("/myprojects", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const developerId = (_a = req.developer) === null || _a === void 0 ? void 0 : _a.id;
+    const developername = (_b = req.developer) === null || _b === void 0 ? void 0 : _b.name;
+    try {
+        const projects = yield db_1.default.developer.findMany({
+            where: { id: developerId },
+            select: {
+                name: true,
+                projects: true
+            }
+        });
+        const response = {
+            username: projects[0].name,
+            projects: projects[0].projects
+        };
+        console.log(response);
+        // projects[0].projects.
+        return void res.status(200).json(response);
+    }
+    catch (e) {
+        console.log(e);
+        return void res.status(511).json({
+            message: "Couldnt get the projects"
+        });
+    }
+}));
 router.put("/addskills", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     debugger;

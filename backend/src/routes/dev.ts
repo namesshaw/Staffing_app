@@ -129,6 +129,32 @@ router.post("/signin", async (req, res) => {
     });
 });
 
+router.get("/myprojects", devAuth, async (req, res) => {
+    const developerId = (req as any).developer?.id;
+    const developername = (req as any).developer?.name;
+    try {
+        const projects = await prismaClient.developer.findMany({
+            where: { id: developerId },
+            select : {
+              name : true,
+              projects : true}
+        })
+        const response = {
+          username: projects[0].name,
+          projects: projects[0].projects
+      };
+        console.log(response)
+        // projects[0].projects.
+        return void res.status(200).json(response)
+    } catch (e) {
+        console.log(e);
+        return void res.status(511).json({
+            message: "Couldnt get the projects"
+        })
+    }
+  
+  });
+
 router.put("/addskills", devAuth, async (req: DeveloperRequest, res: Response) => {
     debugger
     const skills: Skill[] = req.body.skills as {

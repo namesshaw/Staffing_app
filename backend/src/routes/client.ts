@@ -4,9 +4,14 @@ import jwt from "jsonwebtoken";
 import zod from "zod";
 import { userAuth } from "../middleware/Auth";
 import { User } from "../interfaces";
+import { Developer } from "../interfaces";
 const cookieParser = require('cookie-parser');
 import dotenv from "dotenv";
 dotenv.config();
+import OpenAI from "openai";
+const openaiClient = new OpenAI({
+    apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted
+  });
 interface UserRequest extends Request {
   user?: User;
 }
@@ -24,7 +29,18 @@ const PROJECT = zod.object({
   budget: zod.number().multipleOf(0.1),
   timeline: zod.number(),
   required_developers: zod.number(),
-  skills : zod.array(SKILL_SCHEMA)
+  skills : zod.array(SKILL_SCHEMA),
+  Assigned_developers: zod.array(zod.object({
+  id:             zod.string(),   
+  name:           zod.string(),
+  YOE:            zod.number().multipleOf(0.1),
+  email:          zod.string().email(),
+  phone:          zod.string(),
+  password:       zod.string(),
+  rating:         zod.number().multipleOf(0.1),
+  hrate:          zod.number()
+  }))
+
 });
 const USER_BODY = zod.object({
   name: zod.string(),
@@ -156,6 +172,7 @@ router.post("/signin", async (req: Request, res: Response) => {
   });
 });
 router.post("/addproject",userAuth ,async (req: UserRequest, res: Response) => {
+  debugger
   
   console.log(req.body)
 
@@ -182,6 +199,11 @@ router.post("/addproject",userAuth ,async (req: UserRequest, res: Response) => {
               budget: parsedProject.data.budget,
               timeline: parsedProject.data.timeline,
               required_developers: parsedProject.data.required_developers,
+              Assigned_developers: {
+                connect: parsedProject.data.Assigned_developers.map((developer) => ({
+                  id: developer.id
+                }))
+              }
             },
           });
 
@@ -293,5 +315,134 @@ router.get("/myprojects", userAuth, async (req, res) => {
   }
 
 });
+router.post("/llm", async(req, res) => {
+  debugger
+  const input = req.body.input;
+  try{
+      const devs = await prismaClient.developer.findMany({
+          select : {
+              id : true,
+              name : true, 
+              YOE : true,
+              // rating : true,
+              // schedule : true,
+              // hourly_rate : true,
+              skills : true
+          }
+      })
+      console.log(devs)
+      const prompt = `
+      context : ${input}
+      
+      Deduce the budget, duration, and the kind of project the user wants to build from the context
+      provided. Below is the list of available developers. Scan through them and retrieve the relevant 
+      information. If the context contains the tech stack to be used explicitly then only select those
+      developers with the given data. If the context contains minimum proficiency and/or minimum rating 
+      then also put the relevant filter while selecting the developers
+      
+      Here is the list of the developers to choose from:
+      Available developer : ${devs.map((d) => 
+          ` -> (Id : ${d.id}): Skills: ${d.skills.map(skill => 
+          `${skill.name} + ${skill.proficiency}`).join(", ")}, Name: ${d.name}, YOE: ${d.YOE}`
+      ).join("\n")}
+      
+      Based on the context and the dev list choose and suggest
+      - The most suitable tech stack
+      - The number and type of developers needed
+      - The best team composition from the available developers, considering their skills, 
+        proficiency, and hourly rates (assume 8 hours/day work)
+      - Ensure the total cost fits within the budget and the project can be completed 
+        in the given duration
+
+        Return your reasoning, the suggested tech stack, and the selected developers 
+        (with their names) as a JSON array in a field called "retrievedList". Example:. 
+        { "name": "Example project",
+          "timeline": 30 (number),
+          "budget": 1000 (number),
+          "skills": [{name: React.js,
+                     proficiency: begineer}, 
+                     {name: Typescript,
+                     proficiency: expert}],
+          "retrievedList": [
+              { "id": "dev1", "name": "Alice", "skills": ["React", "Node.js"], "YOE": 5 }
+          ]
+      }
+
+      `
+
+      const response = await openaiClient.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: "user", content: prompt }]
+        });
+      
+      const outputText = response.choices[0].message.content;
+
+      // Try to extract JSON from the LLM output
+      let retrievedList = {};
+      let timeline:number = 1
+      let budget:number = 1000
+      let skills = {}
+      let name = "goodname"
+
+      try {
+        if (!outputText) {
+          throw new Error("Output text is null or undefined");
+        }
+        const jsonStart = outputText.indexOf('{');
+        const jsonEnd = outputText.lastIndexOf('}');
+        if (jsonStart !== -1 && jsonEnd !== -1) {
+          const jsonString = outputText.substring(jsonStart, jsonEnd + 1);
+          timeline      = JSON.parse(jsonString).timeline;
+          budget        = JSON.parse(jsonString).budget;
+          skills        = JSON.parse(jsonString).skills;
+          name          = JSON.parse(jsonString).name;
+          retrievedList = JSON.parse(jsonString).retrievedList;
+
+        }
+      } catch (e) {
+        console.log("Failed to parse retrievedList from LLM output");
+      }
+
+      console.log(prompt, "\n \n");
+      console.log(outputText, "\n \n");
+      console.log( retrievedList)
+      console.log("budget " + budget )
+      console.log("timeline " + timeline)
+      console.log("Skills: " + skills)
+      console.log("name: " + name)
+      
+      return void res.status(200).json({ timeline, budget, retrievedList, name, skills })
+      
+  }
+  catch(e){
+      console.log(e);
+      return void res.status(511).json({
+          message: "Something went wrong"
+      })
+  }
+})
+router.post("/getdevs", userAuth, async(req, res)=>{
+  debugger;
+  try {
+    const ids = req.body.ids;
+    const developers = await prismaClient.developer.findMany({
+      where: {
+        id: {
+          in: ids // Use the 'in' operator for array of IDs
+        }
+      }
+    });
+  debugger
+  console.log(developers);
+  return void res.status(200).json(
+    developers
+  )
+  } catch (error) {
+    console.log(error);
+      return void res.status(511).json({
+          message: "Something went wrong"
+      })
+  }
+})
 
 export default router;

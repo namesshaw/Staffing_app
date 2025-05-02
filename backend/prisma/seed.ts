@@ -254,6 +254,7 @@ async function main() {
   ];
   
   for (let i = 0; i < 30; i++) {
+    const skillSet = skillSets[i % skillSets.length];
     const dev = await prismaClient.developer.create({
       data: {
         name: `Developer${i + 1}`,
@@ -262,8 +263,9 @@ async function main() {
         phone: `90000000${i + 1}`,
         password: 'password123',
         rating: Math.round((Math.random() * 5 + 3) * 10) / 10, // 3.0 - 8.0
+        hrate: Math.floor(Math.random() * 1000) + 500, // e.g. 500 - 1499
         skills: {
-          create: skillSets[i].map(skill => ({
+          create: skillSet.map(skill => ({
             name: skill.name,
             proficiency: skill.proficiency,
           })),

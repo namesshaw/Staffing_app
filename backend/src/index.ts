@@ -1,11 +1,13 @@
 import  prismaClient  from "./db/db.js"
 import express from "express"
-const app = express()
+export const app = express()
 import cors from "cors" 
 import { InitWebsocket } from "./websocket/socket"
 import mainrouter from "./routes"
 
-const server = InitWebsocket();
+if (process.env.NODE_ENV !== 'test') {
+    InitWebsocket();
+  }
 app.use(cors(
     {
         origin: 'http://localhost:3001',

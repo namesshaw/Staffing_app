@@ -18,6 +18,7 @@ export const userAuth = async (
     res: Response,
     next: NextFunction
 ) => {
+    
     const token = req.headers.authorization;
     if (!token) {
         return void res.status(400).json({

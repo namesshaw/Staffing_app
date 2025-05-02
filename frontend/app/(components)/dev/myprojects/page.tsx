@@ -37,7 +37,7 @@ export default function YourProjects() {
     //   try{}
     // }
     fetchProjects()
-  }, [])
+  }, [projects])
 
   if (loading) {
     return (

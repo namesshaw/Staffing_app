@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { UserIcon, PlusCircleIcon, FolderIcon } from "lucide-react"
+// import { UserIcon, PlusCircleIcon, FolderIcon } from "lucide-react"
 import axios from "axios"
 
 // Update the Skill interface
@@ -25,7 +25,7 @@ export default function AddProject() {
         proficiency: "Beginner"
     })
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState("")
+    // const [error, setError] = useState("")
 
     // Add skill handler
     const handleAddSkill = (e: React.FormEvent) => {
@@ -50,7 +50,7 @@ export default function AddProject() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
-        setError("")
+        // setError("")
 
         try {
             const response = await axios.post(
@@ -61,7 +61,7 @@ export default function AddProject() {
                 router.push('/client/home')
             }
         } catch (err) {
-            setError("Failed to create project. Please try again.")
+            // setError("Failed to create project. Please try again.")
             console.error(err)
         } finally {
             setLoading(false)
@@ -184,10 +184,10 @@ export default function AddProject() {
                                         proficiency: e.target.value as Skill["proficiency"]
                                     })}
                                 >
-                                    <option value="Beginner">Beginner</option>
-                                    <option value="Intermediate">Intermediate</option>
-                                    <option value="Advanced">Advanced</option>
-                                    <option value="Expert">Expert</option>
+                                    <option className="bg-gray-900" value="Beginner">Beginner</option>
+                                    <option className="bg-gray-900" value="Intermediate">Intermediate</option>
+                                    <option className="bg-gray-900" value="Advanced">Advanced</option>
+                                    <option className="bg-gray-900" value="Expert">Expert</option>
                                 </select>
                             </div>
                             <button

@@ -48,7 +48,7 @@ export default function UserSignup() {
     setError('');
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/v1/user/signup`,
+        `http://localhost:3000/api/v1/client/signup`,
         {
           ...formData,
         },
@@ -71,9 +71,16 @@ export default function UserSignup() {
       );
 
       setSubmitted(true);
+      // Reduced timeout to 2 seconds and added error handling
       setTimeout(() => {
-        router.push('/client/home');
-      }, 1500);
+        try {
+          router.push('/client/home');
+        } catch (err) {
+          console.error('Navigation failed:', err);
+          // Fallback direct navigation
+          window.location.href = '/client/home';
+        }
+      }, 2000);
     } catch (err) {
       console.error(err);
       setError('Signup failed. Please try again.');

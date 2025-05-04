@@ -21,7 +21,7 @@ jobs:
                 context: .
                 file: ./docker/Dockerfile.backend
                 push: true
-                tags: alexgoot/backend:${{ github.sha }}  
+                tags: alexgoot/staff_backend:${{ github.sha }}  
             - name: Debug database URL
               run: echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
             - name: Deploy to the VM
@@ -56,4 +56,4 @@ jobs:
                     -e JWT_SECRET='${{ secrets.OPENAI_API_KEY }}' \
                     --name backend \
                     --network staffingUp-network \
-                    alexgoot/backend:${{ github.sha }}
+                    alexgoot/staff_backend:${{ github.sha }}

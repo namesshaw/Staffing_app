@@ -4,11 +4,13 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "build": "tsc -b",
+    "build": " tsc -b",
     "watch": "tsc -b --watch",
     "serve": "nodemon dist/index.js",
     "devts": "concurrently  \"npm run watch\" \"npm run serve\"",
+    "prod": "npx prisma migrate deploy && npm run devts",
     "prisma:seed": "ts-node ./prisma/seed.ts"
+    
   },
   "keywords": [],
   "author": "",

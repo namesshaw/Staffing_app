@@ -1,0 +1,57 @@
+name: Continuous Deployment (Prod) (Backend)
+on:
+    push:
+      branches:
+        - main
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout the code
+              uses: actions/checkout@v3
+
+            - name: Docker Login
+              uses: docker/login-action@v2
+              with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_PASSWORD }}
+            - name: Build and push to Docker Hub    
+              uses: docker/build-push-action@v4
+              with:
+                context: .
+                file: ./docker/Dockerfile.backend
+                push: true
+                tags: alexgoot/backend:${{ github.sha }}  
+            - name: Debug database URL
+              run: echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
+            # - name: Deploy to the VM
+            #   run: |
+            #     # Save the SSH private key from GitHub secrets to a file
+                # echo "${{ secrets.SSH_KEY }}" > ~/ssh_key
+      
+            #     # Set correct file permissions for the SSH key
+            #     chmod 600 ~/ssh_key
+      
+            #     # SSH to the VM and stop/remove the old container, then run the new container
+            #     ssh -o StrictHostKeyChecking=no -i ~/ssh_key ubuntu@3.110.37.154 -t "
+            #       # Stop and remove the existing container (if any)
+            #       docker network create arch-network || true
+            #       docker stop user_backend || true
+            #       docker rm user_backend || true
+            #       docker stop postgres || true
+            #       docker rm postgres || true
+            #     # Run the new container with environment variables
+            #       docker run -d \
+            #         -e POSTGRES_PASSWORD=randompassword \
+            #         --name postgres \
+            #         --network arch-network \
+            #         postgres
+                    
+            #       # Run the new container with environment variables
+            #       docker run -d \
+            #         -p 3000:3000 \
+            #         -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+            #         -e JWT_SECRET='${{ secrets.JWT_SECRET }}' \
+            #         --name user_backend \
+            #         --network arch-network \
+            #         imssb22/arch-backend:${{ github.sha }}

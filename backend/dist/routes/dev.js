@@ -48,6 +48,7 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
                 email: parsedDev.data.email,
                 phone: parsedDev.data.phone,
                 password: parsedDev.data.password,
+                hrate: 0, // Default value for hrate, adjust as needed
             },
         });
         if (!developer) {

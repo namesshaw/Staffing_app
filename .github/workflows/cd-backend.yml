@@ -34,7 +34,7 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/ssh_key
           chmod 600 ~/ssh_key
 
-          ssh -o StrictHostKeyChecking=no -i ~/ssh_key ubuntu@4.213.167.255 << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/ssh_key Shrirang@4.213.167.255 << 'EOF'
             docker network create staffingUp-network || true
             docker stop backend || true
             docker rm backend || true

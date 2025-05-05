@@ -39,6 +39,7 @@ router.post("/signup", async (req, res) => {
                 email: parsedDev.data.email,
                 phone: parsedDev.data.phone,
                 password: parsedDev.data.password,
+                hrate: 0, // Default value for hrate, adjust as needed
             },
         });
         if (!developer) {

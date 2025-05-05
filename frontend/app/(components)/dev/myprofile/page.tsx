@@ -64,7 +64,7 @@ export default function ProfilePage() {
     };
 
     getData();
-  }, [developer]);
+  }, [developer, token]);
 
   const saveEdit = async () => {
     if (isEditing) {

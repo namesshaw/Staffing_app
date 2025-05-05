@@ -31,7 +31,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.get(`${process.env.API_URL}/client/info`,
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/client/info`,
           {
             headers: {
               Authorization: token,
@@ -64,7 +64,7 @@ export default function ProfilePage() {
     if (isEditing) {
       console.log(isEditing);
       try {
-        const res = await axios.put(`${process.env.API_URL}/client/edit/${isEditing}`,
+        const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/client/edit/${isEditing}`,
           { change: tempValue }
         );
         if (res.status === 200) {

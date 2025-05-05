@@ -50,7 +50,7 @@ export default function UserSignup() {
     setError('');
     try {
       const response = await axios.post(
-        `${process.env.API_URL}/client/signup`,
+        `${process.env.NEXT_PUBLIC_API_URL}/client/signup`,
         {
           ...formData,
         },

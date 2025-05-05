@@ -20,7 +20,7 @@ export default function AddSkills() {
 
     const getSkills = async() => {
         try {
-            const response = await axios.get(`${process.env.API_URL}/dev/getskills`)
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/dev/getskills`)
             setSkills(response.data[0].skills)
         } catch(e) {
             console.log(e)
@@ -56,7 +56,7 @@ export default function AddSkills() {
 
     const handleSubmit = async () => {
         try {
-            await axios.put(`${process.env.API_URL}/dev/addskills`, 
+            await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/dev/addskills`, 
                 { skills },
             )
             router.push('/dev/addskills') // Or wherever you want to redirect after success

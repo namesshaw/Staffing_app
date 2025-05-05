@@ -27,7 +27,7 @@ export default function DeveloperSignin() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${process.env.API_URL}/dev/signin`,
+        `${process.env.NEXT_PUBLIC_API_URL}/dev/signin`,
         {
           email: formData.email,
           password: formData.password,

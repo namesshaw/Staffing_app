@@ -39,7 +39,7 @@ export default function ProfilePage() {
     const getData = async () => {
       
       try {
-        const response = await axios.get(`${process.env.API_URL}/dev/info`,
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/dev/info`,
 
           {
             headers: {
@@ -71,7 +71,7 @@ export default function ProfilePage() {
   const saveEdit = async () => {
     if (isEditing) {
       try {
-        const res = await axios.put(`${process.env.API_URL}/dev/edit/${isEditing}`,
+        const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/dev/edit/${isEditing}`,
           { change: tempValue }
         );
         if (res.status === 200) {

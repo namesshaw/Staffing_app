@@ -53,7 +53,7 @@ jobs:
                       -e DEV_JWT_SECRET='${{ secrets.DEV_JWT_SECRET }}' \
                       -e USER_JWT_SECRET='${{ secrets.USER_JWT_SECRET }}' \
                       -e OPENAI_API_KEY='${{ secrets.OPENAI_API_KEY }}' \
-                      -e API_URL='${{ secrets.API_URL }}' \
+                      -e NEXT_PUBLIC_API_URL='${{ secrets.API_URL }}' \
                       -e WS_URL='${{ secrets.WS_URL }}' \
                       --name backend \
                       --network staffingUp-network \

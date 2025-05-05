@@ -25,7 +25,7 @@ export default function Navbar({ onSignupClick }: NavbarProps) {
 
   async function handlelogout() {
     dispatch(logout());
-    await axios.get(`${process.env.API_URL}/logout`, {
+    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
       withCredentials: true
     });
     router.push("/");

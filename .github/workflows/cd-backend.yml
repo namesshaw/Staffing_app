@@ -57,5 +57,5 @@ jobs:
                       -e WS_URL ='${{ secrets.WS_URL }}' \
                       --name backend \
                       --network staffingUp-network \
-                      alexgoot/staff_backend:${{ github.sha }} EOF
+                      alexgoot/staff_backend:${{ github.sha }} << EOF
              

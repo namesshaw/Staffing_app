@@ -16,7 +16,8 @@ export default function Home() {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  return !token ? (
+  return  (<>
+    {!token ?(
     <div className="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen text-white flex flex-col overflow-x-hidden">
       {/* Navbar with signup modal handler */}
       <Navbar onSignupClick={openModal} />
@@ -143,6 +144,6 @@ export default function Home() {
       {isModalOpen && (
         <SignupPromptModal isOpen={isModalOpen} closeModal={closeModal} />
       )}
-    </div>
-  ) : router.push(`/home`);
+    </div>)
+  : (router.push(`/home`), null)}</>)
 }

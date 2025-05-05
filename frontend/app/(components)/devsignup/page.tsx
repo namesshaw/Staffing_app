@@ -9,7 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../public/store';
 import { login } from '@/public/features/authSlice';
 import { setAuthCookie } from '../_cookies/cookies';
-
+import dotenv from "dotenv";
+dotenv.config();
 interface Developer {
   name: string;
   YOE: number;
@@ -48,7 +49,7 @@ export default function DeveloperSignup() {
     setError('');
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/v1/dev/signup`,
+        `${process.env.API_URL}/dev/signup`,
         {
           ...formData,
         },

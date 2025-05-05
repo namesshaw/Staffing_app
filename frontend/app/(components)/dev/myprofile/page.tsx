@@ -10,6 +10,8 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/public/store';
+import dotenv from "dotenv";
+dotenv.config();
 export default function ProfilePage() {
   const [developer, setDeveloper] = useState<Developer>({
     id: 'dev123',
@@ -37,7 +39,7 @@ export default function ProfilePage() {
     const getData = async () => {
       
       try {
-        const response = await axios.get('http://localhost:3000/api/v1/dev/info',
+        const response = await axios.get(`${process.env.API_URL}/dev/info`,
 
           {
             headers: {
@@ -69,7 +71,7 @@ export default function ProfilePage() {
   const saveEdit = async () => {
     if (isEditing) {
       try {
-        const res = await axios.put(`http://localhost:3000/api/v1/dev/edit/${isEditing}`,
+        const res = await axios.put(`${process.env.API_URL}/dev/edit/${isEditing}`,
           { change: tempValue }
         );
         if (res.status === 200) {

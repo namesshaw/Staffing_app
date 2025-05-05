@@ -52,8 +52,3 @@ export default async function Home() {
     </main>
   );
 }
-export async function logout() {
-  const cookieStore = await cookies()
-  cookieStore.delete('token')
-  redirect('/')
-}

@@ -36,7 +36,7 @@ export default function UserSignup() {
     if (token) {
       router.push('/client/home');
     }
-  }, [token]);
+  }, [token, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

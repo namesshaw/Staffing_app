@@ -63,11 +63,6 @@ export default function AIProjectPage() {
           skills: skills,
           name: name
         },
-        {
-          headers: {
-            'Authorization': token
-          }
-        }
       );
 
       if (project.status === 200) {

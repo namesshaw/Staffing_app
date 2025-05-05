@@ -23,35 +23,36 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState<keyof User | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
 
+  
+
+  
   useEffect(() => {
-    getData();
-  }, [User]);
-
-  const getData = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/api/v1/client/info',
-        {
-          headers: {
-            Authorization: token,
+    const getData = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/v1/client/info',
+          {
+            headers: {
+              Authorization: token,
+            }
           }
-        }
-      );
-      const data = response.data;
-      setUser({
-        name: data.name,
-        company: data.company || "Default Company",
-        email: data.email,
-        phone: data.phone,
-        password: data.password,
-        rating: data.rating,
-        id: data.id || "Default ID"
-      });
-    } catch (e) {
-      console.log(e);
-      alert("Something went wrong");
-    }
-  };
-
+        );
+        const data = response.data;
+        setUser({
+          name: data.name,
+          company: data.company || "Default Company",
+          email: data.email,
+          phone: data.phone,
+          password: data.password,
+          rating: data.rating,
+          id: data.id || "Default ID"
+        });
+      } catch (e) {
+        console.log(e);
+        alert("Something went wrong");
+      }
+    };
+    getData();
+  }, [User, token]);
   const startEditing = (field: keyof User) => {
     setIsEditing(field);
     setTempValue(User[field].toString());

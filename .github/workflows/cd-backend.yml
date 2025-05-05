@@ -35,19 +35,19 @@ jobs:
           chmod 600 ~/ssh_key
 
           ssh -o StrictHostKeyChecking=no -i ~/ssh_key Shrirang@4.213.167.255 << 'EOF'
-            docker network create staffingUp-network || true
-            docker stop backend || true
-            docker rm backend || true
-            docker stop postgres || true
-            docker rm postgres || true
+           sudo docker network create staffingUp-network || true
+           sudo docker stop backend || true
+           sudo docker rm backend || true
+           sudo docker stop postgres || true
+           sudo docker rm postgres || true
 
-            docker run -d \
+           sudo docker run -d \
               -e POSTGRES_PASSWORD=randompassword \
               --name postgres \
               --network staffingUp-network \
               postgres
 
-            docker run -d \
+           sudo docker run -d \
               -p 3000:3000 \
               -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
               -e DEV_JWT_SECRET='${{ secrets.DEV_JWT_SECRET }}' \

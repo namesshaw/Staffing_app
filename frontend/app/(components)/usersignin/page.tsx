@@ -26,7 +26,7 @@ export default function UserSignin() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${process.env.API_URL}/client/signin`,
+        `${process.env.NEXT_PUBLIC_API_URL}/client/signin`,
         {
           email: formData.email,
           password: formData.password,

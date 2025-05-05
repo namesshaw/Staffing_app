@@ -29,7 +29,7 @@ export default function Chat() {
   useEffect(() => {
     const getChats = async () => {
       try {
-        const response = await axios.get(`${process.env.API_URL}/chatroom/${roomId}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/chatroom/${roomId}`);
         setChats(response.data);
       } catch (error) {
         console.error('Failed to fetch chats:', error);
@@ -76,6 +76,7 @@ export default function Chat() {
       ws.close();
     };
   }, [roomId, userId, username]);
+  
 
   useEffect(() => {
     if (chatContainerRef.current) {

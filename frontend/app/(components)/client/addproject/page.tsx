@@ -56,7 +56,7 @@ export default function AddProject() {
 
         try {
             const response = await axios.post(
-                `${process.env.API_URL}/client/addproject`,
+                `${process.env.NEXT_PUBLIC_API_URL}/client/addproject`,
                 projectData,
             )
             if (response.status === 200) {

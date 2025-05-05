@@ -30,7 +30,7 @@ export default function AIProjectPage() {
     setIsLoading(true);
     
     try {
-      const response1 = await axios.post<LLMResponse>(`${process.env.API_URL}/client/llm`, {
+      const response1 = await axios.post<LLMResponse>(`${process.env.NEXT_PUBLIC_API_URL}/client/llm`, {
         input: prompt 
       });
       console.log(response1);
@@ -45,7 +45,7 @@ export default function AIProjectPage() {
       const name = response1.data.name;
       console.log(ids);
       const token = localStorage.getItem('token');
-      const response2 = await axios.post(`${process.env.API_URL}/client/getdevs`, { ids: ids },
+      const response2 = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/client/getdevs`, { ids: ids },
         {
           headers: {
             'Authorization': token
@@ -55,7 +55,7 @@ export default function AIProjectPage() {
       console.log(response2);
 
       const project = await axios.post(
-        `${process.env.API_URL}/client/addproject`,
+        `${process.env.NEXT_PUBLIC_API_URL}/client/addproject`,
         {
           Assigned_developers: response2.data,
           timeline: timeline,

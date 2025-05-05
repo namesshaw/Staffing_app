@@ -49,7 +49,7 @@ export default function DeveloperSignup() {
     setError('');
     try {
       const response = await axios.post(
-        `${process.env.API_URL}/dev/signup`,
+        `${process.env.NEXT_PUBLIC_API_URL}/dev/signup`,
         {
           ...formData,
         },

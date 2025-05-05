@@ -10,7 +10,10 @@ if (process.env.NODE_ENV !== 'test') {
   }
 app.use(cors(
     {
-        origin: 'http://localhost:3001',
+        origin: [
+            'http://localhost:3001',
+            'https://staffing-app-ochre.vercel.app'
+        ],
         credentials: true,}
 ))
 app.use(express.json())

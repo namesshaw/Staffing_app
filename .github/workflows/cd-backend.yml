@@ -55,5 +55,5 @@ jobs:
               -e OPENAI_API_KEY='${{ secrets.OPENAI_API_KEY }}' \
               --name backend \
               --network staffingUp-network \
-              alexgoot/staff_backend:${{ github.sha }}
-               EOF
+                      alexgoot/staff_backend:${{ github.sha }}
+            EOF

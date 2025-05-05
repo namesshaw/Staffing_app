@@ -9,5 +9,5 @@ export default function ClientNavbarWrapper() {
   // Render Navbar on all routes except "/"
   if (pathname === '/') return null;
 
-  return <Navbar />;
+  return <Navbar onSignupClick={() => console.log('Signup clicked')} />;
 }

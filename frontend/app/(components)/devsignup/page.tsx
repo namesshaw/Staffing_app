@@ -36,7 +36,7 @@ export default function DeveloperSignup() {
     if (token) {
       router.push('/dev/home');
     }
-  }, [token]);
+  }, [token, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

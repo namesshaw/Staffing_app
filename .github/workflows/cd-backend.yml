@@ -56,4 +56,4 @@ jobs:
               --name backend \
               --network staffingUp-network \
                       alexgoot/staff_backend:${{ github.sha }}
-            EOF
+        EOF

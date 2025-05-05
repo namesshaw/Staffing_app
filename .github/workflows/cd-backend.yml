@@ -1,4 +1,4 @@
-name: Continuous Deployment  (Backend)
+name: Continuous Deployment(Backend)
 
 on:
   push:

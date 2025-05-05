@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, FormEvent } from "react";
 import { useParams } from "next/navigation";
 import type { RootState } from '../../../../../public/store';
 import { useSelector } from 'react-redux';
+import dotenv from "dotenv";
+dotenv.config();
 
 interface Chat {
   id?: string;
@@ -27,7 +29,7 @@ export default function Chat() {
   useEffect(() => {
     const getChats = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/v1/chatroom/${roomId}`);
+        const response = await axios.get(`${process.env.API_URL}/chatroom/${roomId}`);
         setChats(response.data);
       } catch (error) {
         console.error('Failed to fetch chats:', error);
@@ -38,7 +40,7 @@ export default function Chat() {
 
   useEffect(() => {
     if (!username || !userId || !roomId) return;
-    const ws = new WebSocket("ws://localhost:8080");
+    const ws = new WebSocket(`${process.env.WS_URL}`);
     wsRef.current = ws;
 
     ws.onopen = () => {

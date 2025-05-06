@@ -2,7 +2,7 @@
 import { useState, KeyboardEvent, useEffect } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import { Skill } from "../../../../../backend/src/interfaces"
+import { Skill } from '../../../interfaces'
 import dotenv from "dotenv";
 dotenv.config();
 

@@ -39,7 +39,9 @@ export default function Chat() {
   }, [roomId]);
 
   useEffect(() => {
-    if (!username || !userId || !roomId) return;
+    if (!username || !userId || !roomId)
+      console.log("I am Returning");
+      return;
     const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL}`);
     wsRef.current = ws;
 

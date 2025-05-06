@@ -39,4 +39,4 @@ jobs:
                     -e OPENAI_API_KEY='${{ secrets.OPENAI_API_KEY }}' \
                     -e NEXT_PUBLIC_API_URL='${{ secrets.API_URL }}' \
                     --name frontend \
-                    alexgoot/staff_frontend:${{ github.sha }}
+                    alexgoot/staff_frontend:${{ github.sha }} << 'EOF'

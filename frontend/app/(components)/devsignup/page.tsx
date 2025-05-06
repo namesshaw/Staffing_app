@@ -51,7 +51,11 @@ export default function DeveloperSignup() {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/dev/signup`,
         {
-          ...formData,
+          name:formData.name,
+          YOE:Number(formData.YOE),
+          email: formData.email,
+          password:formData.password,
+          phone:   formData.phone
         },
         { withCredentials: true }
       );

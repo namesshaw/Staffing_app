@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Pencil } from 'lucide-react'; // using Lucide icons
 import axios from 'axios';
 import Footer from '../../footer/Footer';
-import { User } from '../../../../../backend/src/interfaces';
+import { User } from '../../../interfaces';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/public/store';
 import dotenv from "dotenv";

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Pencil } from 'lucide-react';
-import { Developer } from "../../../../../backend/src/interfaces";
+import { Developer } from '../../../interfaces';
 import Footer from '../../footer/Footer';
 import SignupPromptModal from '../../signupPromptModal/SignupPromptModal';
 import { useRouter } from 'next/navigation';

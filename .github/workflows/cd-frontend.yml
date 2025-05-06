@@ -20,6 +20,8 @@ jobs:
                 file: ./docker/Dockerfile.frontend
                 push: true
                 tags: alexgoot/staff_frontend:${{ github.sha }}  
+                build-args: |
+                      NEXT_PUBLIC_API_URL=${{ secrets.API_URL }}
             - name: Deploy to VM
               run: |
                 # Save the SSH private key from GitHub secrets to a file
@@ -37,6 +39,6 @@ jobs:
                     -p 3001:3001 \
                     -e USER_JWT_SECRET='${{ secrets.USER_JWT_SECRET }}' \
                     -e OPENAI_API_KEY='${{ secrets.OPENAI_API_KEY }}' \
-                    -e NEXT_PUBLIC_API_URL='${{ secrets.API_URL }}' \
+                    -e API_URL='${{ secrets.API_URL }}' \
                     --name frontend \
                     alexgoot/staff_frontend:${{ github.sha }} << 'EOF'

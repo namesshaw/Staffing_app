@@ -30,10 +30,10 @@ jobs:
       
                 # SSH to the VM and stop/remove the old container, then run the new container
                 ssh -o StrictHostKeyChecking=no -i ~/ssh_key Shrirang@4.213.167.255 << 'EOF'
-                  docker stop user_frontend || true
-                  docker rm user_frontend || true
+                  sudo docker stop frontend || true
+                  sudo docker rm frontend || true
       
-                  docker run -d \
+                 sudo docker run -d \
                     -p 3001:3001 \
                     -e USER_JWT_SECRET='${{ secrets.USER_JWT_SECRET }}' \
                     -e OPENAI_API_KEY='${{ secrets.OPENAI_API_KEY }}' \

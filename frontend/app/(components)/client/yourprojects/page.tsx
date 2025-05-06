@@ -29,7 +29,7 @@ export default function YourProjects() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}client/myprojects`)
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/client/myprojects`)
         setProjects(response.data.projects)
         setCreatorName(response.data.username)
         setLoading(false)

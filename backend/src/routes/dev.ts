@@ -19,6 +19,7 @@ const DEVELOPER = zod.object({
     phone: zod.string(),
     password: zod.string(),
     rating: zod.number().optional(),
+    hrate: zod.number().optional()
 });
 const SIGNINBODY = zod.object({
     email: zod.string(),

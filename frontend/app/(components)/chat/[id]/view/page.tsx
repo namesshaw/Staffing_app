@@ -40,7 +40,7 @@ export default function Chat() {
 
   useEffect(() => {
     if (!username || !userId || !roomId) return;
-    const ws = new WebSocket(`${process.env.WS_URL}`);
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL}`);
     wsRef.current = ws;
 
     ws.onopen = () => {

@@ -5,9 +5,9 @@ import cors from "cors"
 import { InitWebsocket } from "./websocket/socket"
 import mainrouter from "./routes"
 
-if (process.env.NODE_ENV !== 'test') {
+
     InitWebsocket();
-  }
+  
 app.use(cors(
     {
         origin: [

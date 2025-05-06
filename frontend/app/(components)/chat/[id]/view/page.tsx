@@ -86,7 +86,11 @@ export default function Chat() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!message.trim() || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+    if (!message.trim() || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      console.log("1. "+ wsRef.current)
+      console.log("2. "+ wsRef.current?.readyState)
+      console.log("3. " + WebSocket.OPEN )
+      return};
 
     const chatData = {
       type: "chat",

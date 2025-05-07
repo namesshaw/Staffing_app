@@ -44,13 +44,8 @@ export default function AIProjectPage() {
       const skills = response1.data.skills;
       const name = response1.data.name;
       console.log(ids);
-      const token = localStorage.getItem('token');
+    
       const response2 = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/client/getdevs`, { ids: ids },
-        {
-          headers: {
-            'Authorization': token
-          }
-        }
       );
       console.log(response2);
 

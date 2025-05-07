@@ -170,7 +170,6 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
 }));
 router.post("/addproject", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    debugger;
     console.log(req.body);
     const parsedProject = PROJECT.safeParse(req.body);
     if (!parsedProject.success) {
@@ -295,6 +294,7 @@ router.get("/myprojects", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 
                 projects: true
             }
         });
+        // const assigneddevs = await prismaClient.project.
         const response = {
             username: projects[0].name,
             projects: projects[0].projects
@@ -311,7 +311,6 @@ router.get("/myprojects", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 
     }
 }));
 router.post("/llm", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    debugger;
     const input = req.body.input;
     try {
         const devs = yield db_1.default.developer.findMany({
@@ -407,7 +406,6 @@ router.post("/llm", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 }));
 router.post("/getdevs", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    debugger;
     try {
         const ids = req.body.ids;
         const developers = yield db_1.default.developer.findMany({
@@ -417,7 +415,30 @@ router.post("/getdevs", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 0,
                 }
             }
         });
-        debugger;
+        console.log(developers);
+        return void res.status(200).json(developers);
+    }
+    catch (error) {
+        console.log(error);
+        return void res.status(511).json({
+            message: "Something went wrong"
+        });
+    }
+}));
+router.post("/assigneddevs", Auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const ids = req.body.ids;
+        console.log(ids);
+        const developers = yield db_1.default.project.findMany({
+            where: {
+                id: {
+                    in: ids // Use the 'in' operator for array of IDs
+                }
+            },
+            select: {
+                Assigned_developers: true
+            }
+        });
         console.log(developers);
         return void res.status(200).json(developers);
     }

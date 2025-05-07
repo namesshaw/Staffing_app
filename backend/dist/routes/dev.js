@@ -161,7 +161,6 @@ router.get("/myprojects", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0
 }));
 router.put("/addskills", Auth_1.devAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    debugger;
     const skills = req.body.skills;
     const devId = (_a = req.developer) === null || _a === void 0 ? void 0 : _a.id;
     try {

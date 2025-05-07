@@ -296,10 +296,12 @@ router.get("/myprojects", userAuth, async (req, res) => {
   try {
       const projects = await prismaClient.user.findMany({
           where: { id: userId },
+          
           select : {
             name : true,
             projects : true}
       })
+      // const assigneddevs = await prismaClient.project.
       const response = {
         username: projects[0].name,
         projects: projects[0].projects
@@ -430,6 +432,34 @@ router.post("/getdevs", userAuth, async(req, res)=>{
         id: {
           in: ids // Use the 'in' operator for array of IDs
         }
+      }
+    });
+  
+  console.log(developers);
+  return void res.status(200).json(
+    developers
+  )
+  } catch (error) {
+    console.log(error);
+      return void res.status(511).json({
+          message: "Something went wrong"
+      })
+  }
+})
+
+router.post("/assigneddevs", userAuth, async(req, res) =>{
+  try {
+
+    const ids = req.body.ids;
+    console.log(ids)
+    const developers = await prismaClient.project.findMany({
+      where: {
+        id: {
+          in: ids // Use the 'in' operator for array of IDs
+        }
+      },
+      select: {
+        Assigned_developers: true
       }
     });
   

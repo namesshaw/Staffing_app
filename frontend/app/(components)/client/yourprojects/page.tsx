@@ -5,7 +5,17 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import dotenv from "dotenv";
 dotenv.config();
+interface Developer {
+  id : string,
+  name: string,
+  YOE: number,
+  email: string,
+  phone: string,
+  password: string,
+  hrate : number,
+  rating: number
 
+}
 interface Project {
   id: string
   name: string
@@ -13,12 +23,11 @@ interface Project {
   budget: number
   timeline: number
   required_developers: number
-  Assigned_developers: Array<{
-    name: string
-    id: string
-  }>
+  Assigned_developers: Array<Developer>
 }
-
+interface MergedProject extends Project {
+  Assigned_developers: Developer[];
+}
 export default function YourProjects() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
@@ -30,7 +39,24 @@ export default function YourProjects() {
     const fetchProjects = async () => {
       try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/client/myprojects`)
-        setProjects(response.data.projects)
+        console.log(response.data.projects)
+        // let devs = [];
+
+        const projectData = response.data.projects;
+        const ids = projectData.map((item : Project) => item.id)
+        console.log(ids)
+        const devs = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/client/assigneddevs`, { ids: ids },
+        );
+        console.log("devs: " ,devs.data)
+        
+
+        const mergedProjects: MergedProject[] = projectData.map((project: Project, idx: number) => ({
+          ...project,
+          Assigned_developers: devs.data[idx]?.Assigned_developers || [],
+        }));
+        
+        setProjects(mergedProjects);
+        
         setCreatorName(response.data.username)
         setLoading(false)
       } catch (err) {
@@ -108,9 +134,9 @@ export default function YourProjects() {
                   </button>
                   </div>
                   {/* Optional: Assigned Developers */}
-                  {/* <div className="border-t pt-3 mt-3">
+                  <div className="border-t pt-3 mt-3">
                     <h3 className="text-gray-200 mb-2">Assigned Developers:</h3>
-                    {project.Assigned_developers.length > 0 ? (
+                    {Array.isArray(project.Assigned_developers) && project.Assigned_developers.length > 0 ? (
                       <div className="space-y-1">
                         {project.Assigned_developers.map(dev => (
                           <div key={dev.id} className="text-sm text-white">
@@ -119,9 +145,9 @@ export default function YourProjects() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500 italic">No developers assigned yet</p>
+                      <div className="text-gray-400 text-sm">No developers assigned.</div>
                     )}
-                  </div> */}
+                  </div>
                 </div>
               </div>
             </motion.div>

@@ -50,7 +50,7 @@ export default function UserSignup() {
     setError('');
     try {
       const response = await axios.post(
-        `http://4.213.167.255:80/api/v1/client/signup`,
+        `${process.env.NEXT_PUBLIC_API_URL}/client/signup`,
         {
           ...formData,
         },

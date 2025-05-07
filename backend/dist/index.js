@@ -9,9 +9,7 @@ exports.app = (0, express_1.default)();
 const cors_1 = __importDefault(require("cors"));
 const socket_1 = require("./websocket/socket");
 const routes_1 = __importDefault(require("./routes"));
-if (process.env.NODE_ENV !== 'test') {
-    (0, socket_1.InitWebsocket)();
-}
+(0, socket_1.InitWebsocket)();
 exports.app.use((0, cors_1.default)({
     origin: [
         'http://localhost:3001',

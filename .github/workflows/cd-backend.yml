@@ -48,7 +48,7 @@ jobs:
               postgres
 
                    sudo docker run -d \
-                      -p 3000:3000 \
+                      -p 3000:3000 -p 8080:8080 \
                       -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
                       -e DEV_JWT_SECRET='${{ secrets.DEV_JWT_SECRET }}' \
                       -e USER_JWT_SECRET='${{ secrets.USER_JWT_SECRET }}' \

@@ -43,7 +43,7 @@ export default function DeveloperSignin() {
       }
 
       const { token, role, username, userId } = response.data;
-
+      console.log(username, " ", userId, " ")
       localStorage.setItem('token', token);
       setAuthCookie(token);
       dispatch(

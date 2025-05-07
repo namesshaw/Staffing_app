@@ -44,7 +44,7 @@ export default function Chat() {
       return;}
 
       console.log(username + " " + userId + " " + roomId)
-    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL}/ws`);
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL}`);
     wsRef.current = ws;
 
     ws.onopen = () => {

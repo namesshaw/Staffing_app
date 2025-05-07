@@ -4,6 +4,9 @@ import axios from 'axios'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import dotenv from "dotenv";
+import { useSelector } from 'react-redux'
+import type { RootState } from '../../../../public/store';
+
 dotenv.config();
 interface Developer {
   id : string,
@@ -35,7 +38,9 @@ export default function YourProjects() {
   
   const [creatorName, setCreatorName] = useState("")
   const router = useRouter()
+  const token = useSelector((state: RootState) => state.auth.token);
   useEffect(() => {
+  if (!token) return;
     const fetchProjects = async () => {
       try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/client/myprojects`)
@@ -69,7 +74,7 @@ export default function YourProjects() {
     //   try{}
     // }
     fetchProjects()
-  }, [])
+  }, [token])
 
   if (loading) {
     return (

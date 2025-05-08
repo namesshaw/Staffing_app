@@ -112,9 +112,16 @@ export default function DeveloperSignin() {
               required
               className="peer px-4 py-3 w-full rounded-xl border border-gray-700 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 outline-none bg-transparent text-sm text-white placeholder-transparent"
             />
-            <label
-              className="absolute left-4 top-3 text-cyan-400 text-sm transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-xs peer-focus:text-cyan-300"
-            >
+           <label
+                className="absolute left-4 top-3 text-cyan-400 text-sm transition-all
+                  peer-placeholder-shown:top-3.5 
+                  peer-placeholder-shown:text-gray-500 
+                  peer-focus:top-0 
+                  peer-focus:text-xs 
+                  peer-focus:text-cyan-300
+                  peer-[&:not(:placeholder-shown)]:top-0
+                  peer-[&:not(:placeholder-shown)]:text-xs
+                  peer-[&:not(:placeholder-shown)]:text-cyan-300">
               Email
             </label>
           </div>
@@ -131,8 +138,15 @@ export default function DeveloperSignin() {
               className="peer px-4 py-3 w-full rounded-xl border border-gray-700 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 outline-none bg-transparent text-sm text-white placeholder-transparent"
             />
             <label
-              className="absolute left-4 top-3 text-cyan-400 text-sm transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-xs peer-focus:text-cyan-300"
-            >
+                className="absolute left-4 top-3 text-cyan-400 text-sm transition-all
+                  peer-placeholder-shown:top-3.5 
+                  peer-placeholder-shown:text-gray-500 
+                  peer-focus:top-0 
+                  peer-focus:text-xs 
+                  peer-focus:text-cyan-300
+                  peer-[&:not(:placeholder-shown)]:top-0
+                  peer-[&:not(:placeholder-shown)]:text-xs
+                  peer-[&:not(:placeholder-shown)]:text-cyan-300">
               Password
             </label>
           </div>

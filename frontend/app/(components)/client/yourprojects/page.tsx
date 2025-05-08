@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import dotenv from "dotenv";
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../../public/store';
+import Link from 'next/link'
 
 dotenv.config();
 interface Developer {
@@ -44,15 +45,15 @@ export default function YourProjects() {
     const fetchProjects = async () => {
       try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/client/myprojects`)
-        console.log(response.data.projects)
+        // console.log(response.data.projects)
         // let devs = [];
 
         const projectData = response.data.projects;
         const ids = projectData.map((item : Project) => item.id)
-        console.log(ids)
+        // console.log(ids)
         const devs = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/client/assigneddevs`, { ids: ids },
         );
-        console.log("devs: " ,devs.data)
+        // console.log("devs: " ,devs.data)
         
 
         const mergedProjects: MergedProject[] = projectData.map((project: Project, idx: number) => ({
@@ -65,7 +66,7 @@ export default function YourProjects() {
         setCreatorName(response.data.username)
         setLoading(false)
       } catch (err) {
-        setError('Failed to fetch projects')
+        setError('Failed to fetch projects, Try refreshing once')
         setLoading(false)
         console.log(err)
       }
@@ -144,8 +145,10 @@ export default function YourProjects() {
                     {Array.isArray(project.Assigned_developers) && project.Assigned_developers.length > 0 ? (
                       <div className="space-y-1">
                         {project.Assigned_developers.map(dev => (
+                          
                           <div key={dev.id} className="text-sm text-white">
-                            {dev.name}
+                            <Link href={`devinfo/${dev.id}/view`}>{dev.name}</Link>
+                            
                           </div>
                         ))}
                       </div>
